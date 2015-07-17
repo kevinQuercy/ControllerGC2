@@ -2,4 +2,3 @@
 public class toRename {
 
 }
-//myname
