@@ -3,3 +3,4 @@
 *.bak
 *.log
 *.class
+/bin/
