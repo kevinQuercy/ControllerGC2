@@ -1,5 +1,6 @@
 package core;
 
+import java.util.Date;
 import java.util.logging.Logger;
 
 import org.jdom2.Document;
@@ -57,6 +58,9 @@ public class RequestHandler {
 				handleContainerReport(rootReq, rootResp);
 				break;
 				
+			case "REQ_SUPERVISION_STATE":
+				handleReqSupervisionState(rootReq, rootResp);
+				
 			default:
 				LOGGER.warning("Client #"+clientNumber+" unsupported request: "+requestType);
 				buildResponseType(rootResp, "ERROR");
@@ -68,6 +72,15 @@ public class RequestHandler {
 	
 	private void handleContainerReport(Element rootReq, Element rootResp) {
 		buildResponseType(rootResp, "OK");
+	}
+	
+	private void handleReqSupervisionState(Element rootReq, Element rootResp) {
+		buildResponseType(rootResp, "RESP_SUPERVISION_STATE");
+		Element eltSupervisionState = new Element("supervision_state");
+		rootResp.addContent(eltSupervisionState);
+		Element eltDateState = new Element("date_state");
+		eltSupervisionState.addContent(eltDateState);
+		eltDateState.setText(new Date().toString());
 	}
 	
 	private void buildResponseType(Element rootResp, String responseType) {
