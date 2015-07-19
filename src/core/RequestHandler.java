@@ -60,6 +60,7 @@ public class RequestHandler {
 				
 			case "REQ_SUPERVISION_STATE":
 				handleReqSupervisionState(rootReq, rootResp);
+				break;
 				
 			default:
 				LOGGER.warning("Client #"+clientNumber+" unsupported request: "+requestType);
