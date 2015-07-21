@@ -36,7 +36,7 @@ public class SocketClientHandler extends Thread {
 		super();
 		this.socket = socket;
 		this.clientNumber = clientNumber;
-		LOGGER.info("New client connecter: #"+clientNumber+", "+socket);
+		LOGGER.info("New client connected: #"+clientNumber+", "+socket);
 	}
 	
 	public void run() {
