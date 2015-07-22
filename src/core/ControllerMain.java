@@ -6,6 +6,7 @@ import java.util.logging.Logger;
  * 
  * main function, starting point of the controller application
  *
+ *todel
  */
 
 public class ControllerMain {
