@@ -6,9 +6,6 @@ import java.util.logging.Logger;
  * 
  * main function, starting point of the controller application
  *
- *
- *
- *TO DEL 
  */
 
 public class ControllerMain {
