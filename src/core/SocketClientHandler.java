@@ -20,8 +20,8 @@ import org.jdom2.Document;
 public class SocketClientHandler extends Thread {
 	private static Logger LOGGER = Logger.getLogger(SocketClientHandler.class.getName());
 
-	XMLSocket xmlsocket;
-	int clientNumber;
+	private XMLSocket xmlsocket;
+	private int clientNumber;
 	
 	public SocketClientHandler(Socket socket, int clientNumber) {
 		super();

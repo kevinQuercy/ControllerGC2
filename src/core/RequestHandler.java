@@ -37,7 +37,7 @@ import org.jdom2.Element;
 public class RequestHandler {
 	private static Logger LOGGER = Logger.getLogger(RequestHandler.class.getName());
 	
-	int clientNumber;
+	private int clientNumber;
 
 	public RequestHandler(int clientNumber) {
 		super();

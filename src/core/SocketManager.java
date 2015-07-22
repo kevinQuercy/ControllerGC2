@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class SocketManager {
 	private static Logger LOGGER = Logger.getLogger(SocketManager.class.getName());
 	
-	int port;
+	private int port;
 
 	public SocketManager(int port) {
 		super();
