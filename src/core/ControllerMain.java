@@ -10,7 +10,7 @@ import data.GeoCoordinate;
 /** @file
  * 
  * main function, starting point of the controller application
- *
+ * 
  */
 
 public class ControllerMain {
