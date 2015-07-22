@@ -62,6 +62,10 @@ public class RequestHandler {
 				handleReqSupervisionState(rootReq, rootResp);
 				break;
 				
+			case "REQ_CIRCUIT":
+				handleReqCircuit(rootReq, rootResp);
+				break;
+				
 			default:
 				LOGGER.warning("Client #"+clientNumber+" unsupported request: "+requestType);
 				buildResponseType(rootResp, "ERROR");
@@ -82,6 +86,23 @@ public class RequestHandler {
 		Element eltDateState = new Element("date_state");
 		eltSupervisionState.addContent(eltDateState);
 		eltDateState.setText(new Date().toString());
+	}
+	
+	private void handleReqCircuit(Element rootReq, Element rootResp) {
+		buildResponseType(rootResp, "RESP_CIRCUIT");
+		Element eltCircuit = new Element("circuit");
+		rootResp.addContent(eltCircuit);
+		for (int i = 0; i < 3; i++)
+		{
+			Element eltLocation = new Element("location");
+			eltCircuit.addContent(eltLocation);
+			Element eltLatitude = new Element("latitude");
+			eltLocation.addContent(eltLatitude);
+			Element eltLongitude = new Element("longitude");
+			eltLocation.addContent(eltLongitude);
+			eltLatitude.setText("43.6");
+			eltLongitude.setText(String.valueOf(1.4+i/100.0));
+		}
 	}
 	
 	private void buildResponseType(Element rootResp, String responseType) {
