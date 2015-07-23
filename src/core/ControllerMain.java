@@ -1,5 +1,8 @@
 package core;
 
+import graph.Graph;
+
+import java.util.Random;
 import java.util.logging.Logger;
 
 import data.Container;
@@ -19,45 +22,58 @@ public class ControllerMain {
 	public static void main(String[] args) {
 		LOGGER.info("Starting");
 		int server_port = 10000; // default
+		int nbContainers = 50; // default
 		
-		if (args.length == 1)
+		if (args.length >= 1)
 		{
 			// override with parameters from command line
-			server_port = Integer.parseInt(args[0]);
+			nbContainers = Integer.parseInt(args[0]);
+			if (args.length >= 2)
+			{
+				server_port = Integer.parseInt(args[1]);
+			}
 		}
 		
-		createContainerSystem();
+		createContainerSystem(nbContainers);
 		
 		SocketManager socketMan = new SocketManager(server_port);
 		socketMan.run();
 	}
-
-	private static class ContainerSetDesc {
-		public GeoCoordinate location;
-		public int containersId[];
-		public ContainerSetDesc(GeoCoordinate location, int[] containersId) {
-			super();
-			this.location = location;
-			this.containersId = containersId;
-		}
-	}
 	
-	// describe a ContainerSet to ease build of ContainerSystem
-	private static ContainerSetDesc csDescs[] = {
-		new ContainerSetDesc(new GeoCoordinate(43.662093, 1.429904), new int[]{1,2,3,4}),
-		new ContainerSetDesc(new GeoCoordinate(43.642684, 1.427742), new int[]{5,6}),
-		new ContainerSetDesc(new GeoCoordinate(43.640468, 1.465994), new int[]{7,8,9}),
-	};
+	private static final GeoCoordinate reference = new GeoCoordinate(43.602704, 1.441745); // Toulouse center
+	private static final double referenceLatSpan = 0.039;
+	private static final double referenceLongSpan = 0.054;
+	private static final double radius = 4500; // metres
 	
-	private static void createContainerSystem() {
+	private static void createContainerSystem(int nbContainers) {
 		ContainerSystem cs = ContainerSystem.getContainerSystem();
+		Random random = new Random(1); // fix seed to reproduce same values
 		
-		for (ContainerSetDesc csDesc: csDescs) {
-			ContainerSet containerSet = new ContainerSet(csDesc.location);
-			for (int id: csDesc.containersId) {
-				containerSet.addContainer(new Container(id));
+		int containerId = 0;
+		while (containerId < nbContainers) {
+			// choose a random location,  inside radius
+			GeoCoordinate location = new GeoCoordinate(0, 0);
+			do {
+				location.setLatitude(reference.getLatitude()+random.nextDouble()*2*referenceLatSpan-referenceLatSpan);
+				location.setLongitude(reference.getLongitude()+random.nextDouble()*2*referenceLongSpan-referenceLongSpan);
+			} while(location.distanceTo(reference) > radius);
+			
+			int n = 1+random.nextInt(5);
+			if (n > nbContainers-containerId)
+				n = nbContainers-containerId;
+			
+			ContainerSet containerSet = new ContainerSet(location);
+			for (int i = containerId; i < containerId+n; i++) {
+				containerSet.addContainer(new Container(i));
 			}
 			cs.addContainerSet(containerSet);
+			containerId += n;
 		}
+		
+		cs.setDepot(reference);
+		
+		// code to be moved: should be triggered by an XML message
+		Graph graph = cs.buildGraph(cs.getContainerSets());
+		graph.solveVehicleRouting(3);
 	}
 }

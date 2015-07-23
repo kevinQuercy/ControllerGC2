@@ -1,5 +1,8 @@
 package data;
 
+import graph.Graph;
+import graph.GraphNode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +26,7 @@ public class ContainerSystem {
 	
 	private List<ContainerSet> containerSets;
 	private Map<Integer,Container> containerById;
+	private GeoCoordinate depot;
 	
 	private ContainerSystem() {
 		super();
@@ -30,6 +34,18 @@ public class ContainerSystem {
 		containerById = new HashMap<>();
 	}
 	
+	public List<ContainerSet> getContainerSets() {
+		return containerSets;
+	}
+
+	public GeoCoordinate getDepot() {
+		return depot;
+	}
+
+	public void setDepot(GeoCoordinate depot) {
+		this.depot = depot;
+	}
+
 	/** add containerSet to the system
 	 * @note containerSet shall already contains its containers
 	 */ 
@@ -54,5 +70,39 @@ public class ContainerSystem {
 				result.add(containerSet);
 		}
 		return result;
+	}
+	
+	public static class ContainerSetGraphNode extends GraphNode {
+		public ContainerSet containerSet;
+		public GeoCoordinate location;
+		
+		@Override
+		public double getWeight(GraphNode destNode) {
+			return location.distanceTo(((ContainerSetGraphNode)destNode).location);
+		}
+	}
+	
+	// generate graph for this list of ContainerSet, adding depot
+	public Graph buildGraph(List<ContainerSet> containerSets) {
+		Graph graph = new Graph();
+		
+		// create nodes for depot and all container sets
+		ContainerSetGraphNode depotNode = new ContainerSetGraphNode();
+		depotNode.containerSet = null;
+		depotNode.location = depot;
+		graph.nodes.add(depotNode);
+		graph.startNode = depotNode;
+		
+		for (ContainerSet cs: containerSets) {
+			ContainerSetGraphNode csNode = new ContainerSetGraphNode();
+			csNode.containerSet = cs;
+			csNode.location = cs.getLocation();
+			graph.nodes.add(csNode);
+		}
+		
+		// build edges
+		graph.buildEdges();
+		
+		return graph;
 	}
 }
