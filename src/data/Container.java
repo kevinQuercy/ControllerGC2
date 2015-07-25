@@ -9,6 +9,7 @@ public class Container {
 	private int containerId;
 	private int weight; // kg
 	private int volume; // L
+	private int volumemax; // L
 	private int fillRatio; // %
 
 	public Container(int containerId) {
@@ -16,6 +17,7 @@ public class Container {
 		this.containerId = containerId;
 		weight = 0;
 		volume = 0;
+		volumemax = 0;
 		fillRatio = 0;
 	}
 	
@@ -31,14 +33,19 @@ public class Container {
 		return volume;
 	}
 
+	public int getVolumeMax() {
+		return volumemax;
+	}
+
 	public int getFillRatio() {
 		return fillRatio;
 	}
 
-	public void setState(int weight, int volume, int fillRatio) {
+	public void setState(int weight, int volume, int volumemax) {
 		this.weight = weight;
 		this.volume = volume;
-		this.fillRatio = fillRatio;
+		this.volumemax = volumemax;
+		this.fillRatio = 100*volume/volumemax;
 	}
 	
 	// whether container should be collected

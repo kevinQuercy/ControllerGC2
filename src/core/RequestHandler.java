@@ -1,10 +1,12 @@
 package core;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+
+import data.Container;
+import data.ContainerSystem;
 
 /** @file
  * 
@@ -76,6 +78,20 @@ public class RequestHandler {
 	}
 	
 	private void handleContainerReport(Element rootReq, Element rootResp) {
+		// get container ID
+		Element eltContRep = rootReq.getChild("container_report");
+		int containerId = Integer.valueOf(eltContRep.getChild("id").getTextNormalize());
+		
+		// get container object associated to this ID
+		Container container = ContainerSystem.getContainerSystem().getContainer(containerId);
+		
+		// update container state
+		container.setState(
+				Integer.valueOf(eltContRep.getChild("weight").getTextNormalize()),
+				Integer.valueOf(eltContRep.getChild("volume").getTextNormalize()),
+				Integer.valueOf(eltContRep.getChild("volumemax").getTextNormalize())
+		);
+
 		buildResponseType(rootResp, "OK");
 	}
 	
@@ -85,7 +101,11 @@ public class RequestHandler {
 		rootResp.addContent(eltSupervisionState);
 		Element eltDateState = new Element("date_state");
 		eltSupervisionState.addContent(eltDateState);
-		eltDateState.setText(new Date().toString());
+		//eltDateState.setText(new Date().toString());
+		
+		//Test Random for Garbage View 
+		int total = 0 + (int)(Math.random()*100); 
+		eltDateState.setText(Integer.toString(total));
 	}
 	
 	private void handleReqCircuit(Element rootReq, Element rootResp) {

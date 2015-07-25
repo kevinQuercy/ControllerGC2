@@ -1,6 +1,7 @@
 package core;
 
 import java.net.Socket;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jdom2.Document;
@@ -41,7 +42,13 @@ public class SocketClientHandler extends Thread {
     				break;
     		
     		// process it and get associated response
-    		Document response = reqHandler.handle(request);
+    		Document response;
+    		try {
+    			response = reqHandler.handle(request);
+    		} catch(Exception e) {
+    			LOGGER.log(Level.SEVERE, "Internal error while processing request", e);
+    			break;
+    		}
     		
     		// send XML response
     		xmlsocket.write(response);
