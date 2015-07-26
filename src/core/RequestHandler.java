@@ -1,12 +1,15 @@
 package core;
 
+import java.util.Date;
 import java.util.logging.Logger;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 
 import data.Container;
+import data.ContainerSet;
 import data.ContainerSystem;
+import data.GeoCoordinate;
 
 /** @file
  * 
@@ -99,13 +102,32 @@ public class RequestHandler {
 		buildResponseType(rootResp, "RESP_SUPERVISION_STATE");
 		Element eltSupervisionState = new Element("supervision_state");
 		rootResp.addContent(eltSupervisionState);
-		Element eltDateState = new Element("date_state");
-		eltSupervisionState.addContent(eltDateState);
-		//eltDateState.setText(new Date().toString());
+		addField(eltSupervisionState, "date_state", new Date().toString());
 		
-		//Test Random for Garbage View 
-		int total = 0 + (int)(Math.random()*100); 
-		eltDateState.setText(Integer.toString(total));
+		Element eltContainerSets = new Element("container_sets");
+		eltSupervisionState.addContent(eltContainerSets);
+		
+		for (ContainerSet cs: ContainerSystem.getContainerSystem().getContainerSets()) {
+			Element eltContainerSet = new Element("container_set");
+			eltContainerSets.addContent(eltContainerSet);
+			
+			addLocation(eltContainerSet, cs.getLocation());
+			addFieldBool(eltContainerSet, "to_be_collected", cs.isReadyForCollect());
+			
+			Element eltContainers = new Element("containers");
+			eltContainerSet.addContent(eltContainers);
+			for (Container container: cs.getContainers()) {
+				Element eltContainer = new Element("container");
+				eltContainers.addContent(eltContainer);
+				
+				addFieldInt(eltContainer, "id", container.getContainerId());
+				addFieldInt(eltContainer, "weight", container.getWeight());
+				addFieldInt(eltContainer, "volume", container.getVolume());
+				addFieldInt(eltContainer, "volumemax", container.getVolumeMax());
+				addFieldInt(eltContainer, "fillratio", container.getFillRatio());
+				addFieldBool(eltContainer, "to_be_collected", container.isReadyForCollect());
+			}
+		}
 	}
 	
 	private void handleReqCircuit(Element rootReq, Element rootResp) {
@@ -116,19 +138,38 @@ public class RequestHandler {
 		{
 			Element eltLocation = new Element("location");
 			eltCircuit.addContent(eltLocation);
-			Element eltLatitude = new Element("latitude");
-			eltLocation.addContent(eltLatitude);
-			Element eltLongitude = new Element("longitude");
-			eltLocation.addContent(eltLongitude);
-			eltLatitude.setText("43.6");
-			eltLongitude.setText(String.valueOf(1.4+i/100.0));
+			addField(eltLocation, "latitude", "43.6");
+			addField(eltLocation, "longitude", String.valueOf(1.4+i/100.0));
 		}
 	}
 	
 	private void buildResponseType(Element rootResp, String responseType) {
 		LOGGER.info("Client #"+clientNumber+" response: "+ responseType);
-		Element eltRespType = new Element("response_type");
-		eltRespType.setText(responseType);
-		rootResp.addContent(eltRespType);
+		addField(rootResp, "response_type", responseType);
+	}
+	
+	private static void addField(Element eltRoot, String fieldname, String value) {
+		Element elt = new Element(fieldname);
+		elt.setText(value);
+		eltRoot.addContent(elt);
+	}
+	
+	private static void addFieldInt(Element eltRoot, String fieldname, int value) {
+		addField(eltRoot, fieldname, String.valueOf(value));
+	}
+	
+	private static void addFieldBool(Element eltRoot, String fieldname, boolean value) {
+		addField(eltRoot, fieldname, String.valueOf(value));
+	}
+	
+	private static void addFieldDouble(Element eltRoot, String fieldname, double value) {
+		addField(eltRoot, fieldname, String.valueOf(value));
+	}
+
+	private static void addLocation(Element eltRoot, GeoCoordinate geoCoord) {
+		Element eltLocation = new Element("location");
+		eltRoot.addContent(eltLocation);
+		addFieldDouble(eltLocation, "latitude", geoCoord.getLatitude());
+		addFieldDouble(eltLocation, "longitude", geoCoord.getLongitude());
 	}
 }
