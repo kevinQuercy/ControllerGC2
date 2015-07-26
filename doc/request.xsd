@@ -13,6 +13,15 @@
   </xs:complexType>
 </xs:element>
 
+<!-- request content for REQ_CIRCUIT -->
+<xs:element name="circuit">
+  <xs:complexType>
+    <xs:sequence>
+	  <xs:element name="index" type="xs:integer"/><!-- 0 to N-1 -->
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
 <xs:element name="request">
   <xs:complexType>
     <xs:sequence>
@@ -21,12 +30,15 @@
 		  <xs:restriction base="xs:string">
 			<xs:enumeration value="CONTAINER_REPORT"/>
 			<xs:enumeration value="REQ_SUPERVISION_STATE"/>
-			<xs:enumeration value="REQ_CIRCUIT"/>
+			<xs:enumeration value="REQ_CIRCUITS"/><!-- get all circuits -->
+			<xs:enumeration value="REQ_CIRCUIT"/><!-- get one specific circuit -->
+			<xs:enumeration value="TRIG_CIRCUIT_COMPUTATION"/><!-- request controller to compute collect circuits -->
 		  </xs:restriction>
 		</xs:simpleType>
 	  </xs:element>
 	  <xs:choice minOccurs="0">
 		<xs:element ref="container_report"/>
+		<xs:element ref="circuit"/>
 	  </xs:choice>
     </xs:sequence>
   </xs:complexType>

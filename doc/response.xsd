@@ -50,6 +50,50 @@
   </xs:complexType>
 </xs:element>
 
+<!-- response content for RESP_CIRCUIT -->
+<xs:element name="circuit">
+  <xs:complexType>
+    <xs:sequence>
+	  <xs:element name="circuit_index" type="xs:integer"/><!-- 0 to N-1 -->
+      <xs:element name="container_sets">
+		<xs:complexType>
+		  <xs:sequence>
+			<xs:element name="container_set" maxOccurs="unbounded">
+			  <xs:complexType>
+			    <xs:sequence>
+				  <xs:element name="location" type="location"/>
+				  <xs:element name="containers">
+					<xs:complexType>
+					  <xs:sequence>
+						<xs:element name="container" maxOccurs="unbounded">
+						  <xs:complexType>
+							<xs:sequence>
+							  <xs:element name="id" type="xs:integer"/>
+							</xs:sequence>
+						  </xs:complexType>
+						</xs:element>
+					  </xs:sequence>
+					</xs:complexType>
+				  </xs:element>
+			    </xs:sequence>
+			  </xs:complexType>
+			</xs:element>
+		  </xs:sequence>
+		</xs:complexType>
+	  </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<!-- response content for RESP_CIRCUITS -->
+<xs:element name="circuits">
+  <xs:complexType>
+    <xs:sequence>
+	  <xs:element ref="circuit" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
 <xs:element name="response">
   <xs:complexType>
     <xs:sequence>
@@ -59,12 +103,15 @@
 			<xs:enumeration value="OK"/>
 			<xs:enumeration value="ERREUR"/>
 			<xs:enumeration value="RESP_SUPERVISION_STATE"/>
-			<xs:enumeration value="RESP_CIRCUIT"/>
+			<xs:enumeration value="RESP_CIRCUITS"/><!-- get all circuits -->
+			<xs:enumeration value="RESP_CIRCUIT"/><!-- get one specific circuit -->
 		  </xs:restriction>
 		</xs:simpleType>
 	  </xs:element>
 	  <xs:choice minOccurs="0">
 		<xs:element ref="supervision_state"/>
+		<xs:element ref="circuits"/>
+		<xs:element ref="circuit"/>
 	  </xs:choice>
     </xs:sequence>
   </xs:complexType>
