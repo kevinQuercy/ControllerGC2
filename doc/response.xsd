@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<!-- basic types for reuse -->
+<xs:complexType name="location"><!-- geographical coordinate -->
+  <xs:sequence>
+    <xs:element name="latitude" type="xs:double"/>
+    <xs:element name="longitude" type="xs:double"/>
+  </xs:sequence>
+</xs:complexType>
+
+<!-- response content for RESP_SUPERVISION_STATE -->
+<xs:element name="supervision_state">
+  <xs:complexType>
+    <xs:sequence>
+	  <xs:element name="date_state" type="xs:string"/>
+      <xs:element name="container_sets">
+		<xs:complexType>
+		  <xs:sequence>
+			<xs:element name="container_set" maxOccurs="unbounded">
+			  <xs:complexType>
+			    <xs:sequence>
+				  <xs:element name="location" type="location"/>
+				  <xs:element name="to_be_collected" type="xs:boolean"/>
+				  <xs:element name="containers">
+					<xs:complexType>
+					  <xs:sequence>
+						<xs:element name="container" maxOccurs="unbounded">
+						  <xs:complexType>
+							<xs:sequence>
+							  <xs:element name="id" type="xs:integer"/>
+							  <xs:element name="weight" type="xs:integer"/>
+							  <xs:element name="volume" type="xs:integer"/>
+							  <xs:element name="volumemax" type="xs:integer"/>
+							  <xs:element name="fillratio" type="xs:integer"/>
+							  <xs:element name="to_be_collected" type="xs:boolean"/>
+							</xs:sequence>
+						  </xs:complexType>
+						</xs:element>
+					  </xs:sequence>
+					</xs:complexType>
+				  </xs:element>
+			    </xs:sequence>
+			  </xs:complexType>
+			</xs:element>
+		  </xs:sequence>
+		</xs:complexType>
+	  </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="response">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="response_type">
+	    <xs:simpleType>
+		  <xs:restriction base="xs:string">
+			<xs:enumeration value="OK"/>
+			<xs:enumeration value="ERREUR"/>
+			<xs:enumeration value="RESP_SUPERVISION_STATE"/>
+			<xs:enumeration value="RESP_CIRCUIT"/>
+		  </xs:restriction>
+		</xs:simpleType>
+	  </xs:element>
+	  <xs:choice minOccurs="0">
+		<xs:element ref="supervision_state"/>
+	  </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>

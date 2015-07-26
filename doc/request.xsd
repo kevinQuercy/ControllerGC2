@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<!-- request content for CONTAINER_REPORT -->
+<xs:element name="container_report">
+  <xs:complexType>
+    <xs:sequence>
+	  <xs:element name="id" type="xs:integer"/>
+      <xs:element name="weight" type="xs:integer"/>
+      <xs:element name="volume" type="xs:integer"/>
+      <xs:element name="volumemax" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="request">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="request_type">
+	    <xs:simpleType>
+		  <xs:restriction base="xs:string">
+			<xs:enumeration value="CONTAINER_REPORT"/>
+			<xs:enumeration value="REQ_SUPERVISION_STATE"/>
+			<xs:enumeration value="REQ_CIRCUIT"/>
+		  </xs:restriction>
+		</xs:simpleType>
+	  </xs:element>
+	  <xs:choice minOccurs="0">
+		<xs:element ref="container_report"/>
+	  </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>
