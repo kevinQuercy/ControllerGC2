@@ -1,6 +1,5 @@
 package core;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
 import org.jdom2.Document;
@@ -106,9 +105,8 @@ public class RequestHandler {
 		buildResponseType(rootResp, "RESP_SUPERVISION_STATE");
 		Element eltSupervisionState = new Element("supervision_state");
 		rootResp.addContent(eltSupervisionState);
-		//[Kevin] : envoi de date au client container commenté et remplacé par un entier aléatoire
+		//[Kevin] : envoi de date au client container supprimé et remplacé par un entier aléatoire
 		// à terme, il faudra renvoyer les données présentes dans la base en fonction de l'ID du container qui à envoyé la requête 
-		//addField(eltSupervisionState, "date_state", new Date().toString());
 		addField(eltSupervisionState, "date_state", Integer.toString((int)(Math.random() * (100 - 0))));
 		
 		Element eltContainerSets = new Element("container_sets");
