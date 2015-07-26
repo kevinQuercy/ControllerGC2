@@ -1,7 +1,5 @@
 package core;
 
-import graph.Graph;
-
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -71,9 +69,6 @@ public class ControllerMain {
 		}
 		
 		cs.setDepot(reference);
-		
-		// code to be moved: should be triggered by an XML message
-		Graph graph = cs.buildGraph(cs.getContainerSets());
-		graph.solveVehicleRouting(3);
+		cs.setNbVehicles(3);
 	}
 }

@@ -38,6 +38,32 @@ public class Graph {
 	 * @return ordered list of nodes to visit, for each vehicle
 	 */
 	public List<List<GraphNode>> solveVehicleRouting(int nbVehicles) {
-		return null;
+		// dummy implementation: create routes with provided nodes, in order
+		
+		// create result
+		List<List<GraphNode>> result = new ArrayList<>();
+		for (int i = 0; i < nbVehicles; i++)
+			result.add(new ArrayList<GraphNode>());
+		
+		// add starting point
+		for (List<GraphNode> circuit: result)
+			circuit.add(startNode);
+		
+		// distribute nodes to the routes
+		int vehicleIdx = 0;
+		for (GraphNode node: nodes) {
+			if (node != startNode) {
+				result.get(vehicleIdx).add(node);
+				vehicleIdx++;
+				if (vehicleIdx >= nbVehicles)
+					vehicleIdx = 0;
+			}
+		}
+			
+		// add starting point to close the circuit
+		for (List<GraphNode> circuit: result)
+			circuit.add(startNode);
+
+		return result;
 	}
 }

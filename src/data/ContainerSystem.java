@@ -27,11 +27,16 @@ public class ContainerSystem {
 	private List<ContainerSet> containerSets;
 	private Map<Integer,Container> containerById;
 	private GeoCoordinate depot;
+	private int nbVehicles;
+	private List<List<ContainerSet>> collectRoutes;
 	
 	private ContainerSystem() {
 		super();
 		containerSets = new ArrayList<>();
 		containerById = new HashMap<>();
+		depot = null;
+		nbVehicles = 0;
+		collectRoutes = null;
 	}
 	
 	public List<ContainerSet> getContainerSets() {
@@ -44,6 +49,14 @@ public class ContainerSystem {
 
 	public void setDepot(GeoCoordinate depot) {
 		this.depot = depot;
+	}
+
+	public int getNbVehicles() {
+		return nbVehicles;
+	}
+
+	public void setNbVehicles(int nbVehicles) {
+		this.nbVehicles = nbVehicles;
 	}
 
 	/** add containerSet to the system
@@ -62,8 +75,30 @@ public class ContainerSystem {
 		return containerById.get(containerId);
 	}
 	
+	public synchronized void trigCircuitComputation() {
+		// get container sets to collect
+		List<ContainerSet> containersToCollect = readyForCollect();
+		
+		// determine circuits
+		Graph graph = buildGraph(containersToCollect);
+		List<List<GraphNode>> routes = graph.solveVehicleRouting(nbVehicles);
+		
+		// store result in collectRoutes
+		collectRoutes = new ArrayList<>();
+		for (List<GraphNode> route: routes) {
+			List<ContainerSet> collectRoute = new ArrayList<>();
+			collectRoutes.add(collectRoute);
+			
+			for (GraphNode node: route) {
+				ContainerSetGraphNode csNode = (ContainerSetGraphNode) node;
+				if (csNode.containerSet != null)
+					collectRoute.add(csNode.containerSet);
+			}
+		}
+	}
+	
 	// Get the list of ContainerSet ready for collect
-	public List<ContainerSet> readyForCollect() {
+	private List<ContainerSet> readyForCollect() {
 		List<ContainerSet> result = new ArrayList<>();
 		for (ContainerSet containerSet: containerSets) {
 			if (containerSet.isReadyForCollect())
@@ -72,7 +107,7 @@ public class ContainerSystem {
 		return result;
 	}
 	
-	public static class ContainerSetGraphNode extends GraphNode {
+	private static class ContainerSetGraphNode extends GraphNode {
 		public ContainerSet containerSet;
 		public GeoCoordinate location;
 		
@@ -83,7 +118,7 @@ public class ContainerSystem {
 	}
 	
 	// generate graph for this list of ContainerSet, adding depot
-	public Graph buildGraph(List<ContainerSet> containerSets) {
+	private Graph buildGraph(List<ContainerSet> containerSets) {
 		Graph graph = new Graph();
 		
 		// create nodes for depot and all container sets

@@ -67,6 +67,10 @@ public class RequestHandler {
 				handleReqSupervisionState(rootReq, rootResp);
 				break;
 				
+			case "TRIG_CIRCUIT_COMPUTATION":
+				handleTrigCircuitComputation(rootReq, rootResp);
+				break;
+				
 			case "REQ_CIRCUIT":
 				handleReqCircuit(rootReq, rootResp);
 				break;
@@ -128,6 +132,11 @@ public class RequestHandler {
 				addFieldBool(eltContainer, "to_be_collected", container.isReadyForCollect());
 			}
 		}
+	}
+	
+	private void handleTrigCircuitComputation(Element rootReq, Element rootResp) {
+		ContainerSystem.getContainerSystem().trigCircuitComputation();
+		buildResponseType(rootResp, "OK");
 	}
 	
 	private void handleReqCircuit(Element rootReq, Element rootResp) {
