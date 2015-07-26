@@ -106,7 +106,10 @@ public class RequestHandler {
 		buildResponseType(rootResp, "RESP_SUPERVISION_STATE");
 		Element eltSupervisionState = new Element("supervision_state");
 		rootResp.addContent(eltSupervisionState);
-		addField(eltSupervisionState, "date_state", new Date().toString());
+		//[Kevin] : envoi de date au client container commenté et remplacé par un entier aléatoire
+		// à terme, il faudra renvoyer les données présentes dans la base en fonction de l'ID du container qui à envoyé la requête 
+		//addField(eltSupervisionState, "date_state", new Date().toString());
+		addField(eltSupervisionState, "date_state", Integer.toString((int)(Math.random() * (100 - 0))));
 		
 		Element eltContainerSets = new Element("container_sets");
 		eltSupervisionState.addContent(eltContainerSets);
@@ -139,6 +142,13 @@ public class RequestHandler {
 		buildResponseType(rootResp, "OK");
 	}
 	
+	private static void addLocation(Element eltRoot, GeoCoordinate geoCoord) {
+		Element eltLocation = new Element("location");
+		eltRoot.addContent(eltLocation);
+		addFieldDouble(eltLocation, "latitude", geoCoord.getLatitude());
+		addFieldDouble(eltLocation, "longitude", geoCoord.getLongitude());
+	}
+
 	private void handleReqCircuit(Element rootReq, Element rootResp) {
 		buildResponseType(rootResp, "RESP_CIRCUIT");
 		Element eltCircuit = new Element("circuit");
@@ -173,12 +183,5 @@ public class RequestHandler {
 	
 	private static void addFieldDouble(Element eltRoot, String fieldname, double value) {
 		addField(eltRoot, fieldname, String.valueOf(value));
-	}
-
-	private static void addLocation(Element eltRoot, GeoCoordinate geoCoord) {
-		Element eltLocation = new Element("location");
-		eltRoot.addContent(eltLocation);
-		addFieldDouble(eltLocation, "latitude", geoCoord.getLatitude());
-		addFieldDouble(eltLocation, "longitude", geoCoord.getLongitude());
 	}
 }
