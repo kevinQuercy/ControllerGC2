@@ -54,7 +54,7 @@
 <xs:element name="circuit">
   <xs:complexType>
     <xs:sequence>
-	  <xs:element name="circuit_index" type="xs:integer"/><!-- 0 to N-1 -->
+	  <xs:element name="index" type="xs:integer"/><!-- 0 to N-1 -->
       <xs:element name="container_sets">
 		<xs:complexType>
 		  <xs:sequence>

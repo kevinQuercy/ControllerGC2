@@ -59,6 +59,10 @@ public class ContainerSystem {
 		this.nbVehicles = nbVehicles;
 	}
 
+	public List<List<ContainerSet>> getCollectRoutes() {
+		return collectRoutes;
+	}
+
 	/** add containerSet to the system
 	 * @note containerSet shall already contains its containers
 	 */ 

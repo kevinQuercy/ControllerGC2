@@ -70,6 +70,10 @@ public class RequestHandler {
 				handleTrigCircuitComputation(rootReq, rootResp);
 				break;
 				
+			case "REQ_CIRCUITS":
+				handleReqCircuits(rootReq, rootResp);
+				break;
+				
 			case "REQ_CIRCUIT":
 				handleReqCircuit(rootReq, rootResp);
 				break;
@@ -106,8 +110,8 @@ public class RequestHandler {
 		Element eltSupervisionState = new Element("supervision_state");
 		rootResp.addContent(eltSupervisionState);
 		
-		//[Kevin] : envoi de date au client container supprimé et remplacé par un entier aléatoire
-		// à terme, il faudra renvoyer les données présentes dans la base en fonction de l'ID du container qui à envoyé la requête 
+		//[Kevin] : envoi de date au client container supprimï¿½ et remplacï¿½ par un entier alï¿½atoire
+		// ï¿½ terme, il faudra renvoyer les donnï¿½es prï¿½sentes dans la base en fonction de l'ID du container qui ï¿½ envoyï¿½ la requï¿½te 
 		addField(eltSupervisionState, "date_state", Integer.toString((int)(Math.random() * (100 - 0))));
 		
 		Element eltContainerSets = new Element("container_sets");
@@ -148,17 +152,50 @@ public class RequestHandler {
 		addFieldDouble(eltLocation, "longitude", geoCoord.getLongitude());
 	}
 
-	private void handleReqCircuit(Element rootReq, Element rootResp) {
-		buildResponseType(rootResp, "RESP_CIRCUIT");
-		Element eltCircuit = new Element("circuit");
-		rootResp.addContent(eltCircuit);
-		for (int i = 0; i < 3; i++)
-		{
-			Element eltLocation = new Element("location");
-			eltCircuit.addContent(eltLocation);
-			addField(eltLocation, "latitude", "43.6");
-			addField(eltLocation, "longitude", String.valueOf(1.4+i/100.0));
+	private void handleReqCircuits(Element rootReq, Element rootResp) {
+		buildResponseType(rootResp, "RESP_CIRCUITS");
+		Element eltCircuits = new Element("circuits");
+		rootResp.addContent(eltCircuits);
+		
+		for (int i = 0; i < ContainerSystem.getContainerSystem().getCollectRoutes().size(); i++) {
+			eltCircuits.addContent(getCircuit(i));
 		}
+	}
+	
+	private void handleReqCircuit(Element rootReq, Element rootResp) {
+		int circuitIndex = Integer.valueOf(rootReq.getChild("circuit").getChildTextNormalize("index"));
+		if (circuitIndex < 0 || circuitIndex >= ContainerSystem.getContainerSystem().getCollectRoutes().size())
+		{
+			buildResponseType(rootResp, "ERROR"); // invalid circuit index
+			return;
+		}
+		
+		buildResponseType(rootResp, "RESP_CIRCUIT");
+		rootResp.addContent(getCircuit(circuitIndex));
+	}
+	
+	private Element getCircuit(int circuitIndex) {
+		Element eltCircuit = new Element("circuit");
+		addFieldInt(eltCircuit, "index", circuitIndex);
+		Element eltContainerSets = new Element("container_sets");
+		eltCircuit.addContent(eltContainerSets);
+		
+		for (ContainerSet containerSet: ContainerSystem.getContainerSystem().getCollectRoutes().get(circuitIndex)) {
+			Element eltContainerSet = new Element("container_set");
+			eltContainerSets.addContent(eltContainerSet);
+			
+			addLocation(eltContainerSet, containerSet.getLocation());
+			
+			Element eltContainers = new Element("containers");
+			eltContainerSet.addContent(eltContainers);
+			for (Container container: containerSet.getContainers()) {
+				Element eltContainer = new Element("container");
+				eltContainers.addContent(eltContainer);
+				
+				addFieldInt(eltContainer, "id", container.getContainerId());
+			}
+		}
+		return eltCircuit;
 	}
 	
 	private void buildResponseType(Element rootResp, String responseType) {
