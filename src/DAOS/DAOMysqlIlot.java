@@ -9,24 +9,16 @@ import DAOS.DAOIlot;
 import data.Ilot;
 
 public class DAOMysqlIlot implements DAOIlot {
-    private static final String sqlSelect = "SELECT * FROM Ilot;";
-    private static String sqlSelectByContact = "SELECT * FROM Ilot WHERE Contact_id = ";
-    private static String sqlInsert = "INSERT INTO Ilot "
-            + " (adresse,codepostal,ville,contact_id) "
-            + " VALUES( ";
-    private static String sqlDelete = "DELETE FROM Ilot WHERE id = '";
-    private static String sqlUpdate = "UPDATE Ilot "
-            + " (adresse,codepostal,ville,contact_id) "
-            + " VALUES (" ;
 
 	@Override
 	public List<Ilot> select() throws Exception {
+	    String sql = "SELECT * FROM Ilot;";
         List<Ilot> liste = new LinkedList<Ilot>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
         //faire la requête
         Statement s = cnx.createStatement();
-        ResultSet r = s.executeQuery(sqlSelect);
+        ResultSet r = s.executeQuery(sql);
 
         //traiter les réponses
         while (r.next()) {
@@ -50,13 +42,14 @@ public class DAOMysqlIlot implements DAOIlot {
 
 	@Override
 	public List<Ilot> selectByContact(int i) throws Exception {
+	    String sql = "SELECT * FROM Ilot WHERE Contact_id = ";
         List<Ilot> liste = new LinkedList<Ilot>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
         //faire la requête
         Statement s = cnx.createStatement();
-        sqlSelectByContact += i + ";";
-        ResultSet r = s.executeQuery(sqlSelectByContact);
+        sql += i + ";";
+        ResultSet r = s.executeQuery(sql);
 
         //traiter les réponses
         while (r.next()) {
@@ -80,16 +73,17 @@ public class DAOMysqlIlot implements DAOIlot {
 
 	@Override
 	public int insert(Ilot i) throws Exception {
+	    String sql = "INSERT INTO Ilot " + " (adresse,codepostal,ville,contact_id) "  + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
-        sqlInsert += "'" + i.get_adresse() + "',";
-        sqlInsert += "'" + i.get_codepostal() + "',";
-        sqlInsert += "'" + i.get_ville() + "',";
-        sqlInsert += "'" + i.get_Contact_id() + "')";
+        sql += "'" + i.get_adresse() + "',";
+        sql += "'" + i.get_codepostal() + "',";
+        sql += "'" + i.get_ville() + "',";
+        sql += "'" + i.get_Contact_id() + "')";
 
-        int n = s.executeUpdate(sqlInsert);
+        int n = s.executeUpdate(sql);
 
         s.close();
         cnx.close();
@@ -98,17 +92,18 @@ public class DAOMysqlIlot implements DAOIlot {
 
 	@Override
 	public int update(Ilot i) throws Exception {
+	    String sql = "UPDATE Ilot " + " (adresse,codepostal,ville,contact_id) " + " VALUES (" ;
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
-        sqlUpdate += "'" + i.get_adresse() + "',";
-        sqlUpdate += "'" + i.get_codepostal() + "',";
-        sqlUpdate += "'" + i.get_ville() + "',";
-        sqlUpdate += "'" + i.get_Contact_id() +  "')";
-        sqlUpdate += " WHERE reference = ' " + i.get_id() + "' ;";
+        sql += "'" + i.get_adresse() + "',";
+        sql += "'" + i.get_codepostal() + "',";
+        sql += "'" + i.get_ville() + "',";
+        sql += "'" + i.get_Contact_id() +  "')";
+        sql += " WHERE reference = ' " + i.get_id() + "' ;";
 
-        int n = s.executeUpdate(sqlUpdate);
+        int n = s.executeUpdate(sql);
 
         s.close();
         cnx.close();
@@ -117,10 +112,11 @@ public class DAOMysqlIlot implements DAOIlot {
 
 	@Override
 	public int delete(Ilot i) throws Exception {
+	    String sql = "DELETE FROM Ilot WHERE id = '";
         Connection cnx = BDManager.getConnexion();
         Statement s = cnx.createStatement();
-        sqlDelete += i.get_id() + "';";
-        int n = s.executeUpdate(sqlDelete);
+        sql += i.get_id() + "';";
+        int n = s.executeUpdate(sql);
         return n;
 	}
 }

@@ -5,23 +5,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Date;
 import data.Historique;
 
 public class DAOMysqlHistorique implements DAOHistorique {
-
-    private static final String sqlSelect = "SELECT * FROM Historique;";
-    private static String sqlSelectByConteneur = "SELECT * FROM Historique WHERE Conteneur_id = ";
-    private static String sqlInsert = "INSERT INTO Historique "
-            + " (conteneur_id,date,poids,volume) "
-            + " VALUES( ";
-    private static String sqlDelete = "DELETE FROM Historique WHERE id = '";
-    private static String sqlUpdate = "UPDATE Historique "
-            + " (conteneur_id,date,poids,volume) "
-            + " VALUES (" ;
     
     @Override
     public List<Historique> select() throws Exception {
+    	String sqlSelect = "SELECT * FROM Historique;";
         List<Historique> liste = new LinkedList<Historique>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
@@ -51,6 +41,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
     
     @Override
     public List<Historique> selectByConteneur(int c) throws Exception {
+    	String sqlSelectByConteneur = "SELECT * FROM Historique WHERE Conteneur_id = ";
         List<Historique> liste = new LinkedList<Historique>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
@@ -81,17 +72,18 @@ public class DAOMysqlHistorique implements DAOHistorique {
 
     @Override
     public int insert(Historique h) throws Exception {
+        String sql = "INSERT INTO Historique " + " (conteneur_id,date,poids,volume) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
-        sqlInsert += "'" + h.get_Conteneur_id() + "',";
+        sql += "'" + h.get_Conteneur_id() + "',";
         java.text.SimpleDateFormat sdf =  new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        sqlInsert += "'" + sdf.format(h.get_date()) + "',";
-        sqlInsert += "'" + h.get_poids() + "',";
-        sqlInsert += "'" + h.get_volume() + "')";
-
-        int n = s.executeUpdate(sqlInsert);
+        sql += "'" + sdf.format(h.get_date()) + "',";
+        sql += "'" + h.get_poids() + "',";
+        sql += "'" + h.get_volume() + "')";
+		// System.out.println ("\nsql :" + sqlInsert + "\n");
+        int n = s.executeUpdate(sql);
 
         s.close();
         cnx.close();
@@ -100,6 +92,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
 
     @Override
     public int update(Historique h) throws Exception {
+        String sqlUpdate = "UPDATE Historique " + " (conteneur_id,date,poids,volume) " + " VALUES (" ;
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
@@ -120,6 +113,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
     
     @Override
     public int delete(Historique h) throws Exception {
+        String sqlDelete = "DELETE FROM Historique WHERE id = '";
         Connection cnx = BDManager.getConnexion();
         Statement s = cnx.createStatement();
         sqlDelete += h.get_id() + "';";

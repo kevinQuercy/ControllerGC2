@@ -6,6 +6,10 @@ public class Conteneur {
 	private int Ilot_id;
 	private int TypeDechets_id;
 
+	public Conteneur() {}
+	public Conteneur(int a) {
+		this.id=a;
+	}
 	public int get_id() {
 		return this.id;
 	}
