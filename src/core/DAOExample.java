@@ -50,10 +50,10 @@ public class DAOExample {
 		// Sauvegarde d'une planification
 		//////////////////////////////////////////////////////////////////////		
 
-		System.out.println ("\nSauvegarde de la planification\n");
+		/*System.out.println ("\nSauvegarde de la planification\n");
 		DAOPlanification daoplanification = DAOFactory.creerDAOPlanification();
 		daoplanification.insert(planif);
-		System.out.println ("\nFin de la sauvegarde\n");
+		System.out.println ("\nFin de la sauvegarde\n");*/
 
 		//////////////////////////////////////////////////////////////////////
 		// Suppression d'une planification
@@ -194,6 +194,44 @@ public class DAOExample {
 		for ( int jrr2 = 0 ; jrr2 < lcam2.size(); jrr2++ ) {
 			Camion camion = lcam2.get(jrr2);
 			System.out.println ("id : " + camion.get_id() + " | Poids max : " + camion.get_poidsmax() + " | Disponible : " + camion.get_disponible());
+		}
+		System.out.println ("\nFin\n");
+		
+		//////////////////////////////////////////////////////////////////////
+		// Récuperer tous les types de dechets
+		//////////////////////////////////////////////////////////////////////
+		
+		System.out.println ("\nRécuperer tous les types de dechets\n");
+		DAOTypedechets daotypedechets = DAOFactory.creerDAOTypedechets();
+		List<Typedechets> ltd = daotypedechets.select();
+		for ( int jrr3 = 0 ; jrr3 < ltd.size(); jrr3++ ) {
+			Typedechets typedechets = ltd.get(jrr3);
+			System.out.println ("id : " + typedechets.get_id() + " | Libelle : " + typedechets.get_libelle());
+		}
+		System.out.println ("\nFin\n");
+		
+		//////////////////////////////////////////////////////////////////////
+		// Récuperer tous les types de benne
+		//////////////////////////////////////////////////////////////////////
+		
+		System.out.println ("\nRécuperer tous les types de benne\n");
+		DAOTypebenne daotypebenne = DAOFactory.creerDAOTypebenne();
+		List<Typebenne> ltb = daotypebenne.select();
+		for ( int jrr4 = 0 ; jrr4 < ltb.size(); jrr4++ ) {
+			Typebenne typebenne = ltb.get(jrr4);
+			System.out.println ("id : " + typebenne.get_id() + " | Volume : " + typebenne.get_volume() + " | Typedechets_id : " + typebenne.get_typedechets_id());
+		}
+		System.out.println ("\nFin\n");		
+		//////////////////////////////////////////////////////////////////////
+		// Récuperer tous les contenir
+		//////////////////////////////////////////////////////////////////////
+		
+		System.out.println ("\nRécuperer tous les types de benne\n");
+		DAOContenir daocontenir = DAOFactory.creerDAOContenir();
+		List<Contenir> ltc = daocontenir.select();
+		for ( int jrr4 = 0 ; jrr4 < ltc.size(); jrr4++ ) {
+			Contenir contenir = ltc.get(jrr4);
+			System.out.println ("Camion_id : " + contenir.get_Camion_id() + " | Typebenne_id : " + contenir.get_Typebenne_id());
 		}
 		System.out.println ("\nFin\n");
 	}

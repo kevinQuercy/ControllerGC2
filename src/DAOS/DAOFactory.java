@@ -59,4 +59,25 @@ public class DAOFactory {
         }
         return dao;
 	}
+	public static DAOTypedechets creerDAOTypedechets() {
+		DAOTypedechets dao = null;
+        if(typeBD.equalsIgnoreCase("Mysql")){
+            dao = new DAOMysqlTypedechets();
+        }
+        return dao;
+	}
+	public static DAOTypebenne creerDAOTypebenne() {
+		DAOTypebenne dao = null;
+        if(typeBD.equalsIgnoreCase("Mysql")){
+            dao = new DAOMysqlTypebenne();
+        }
+        return dao;
+	}
+	public static DAOContenir creerDAOContenir() {
+		DAOContenir dao = null;
+        if(typeBD.equalsIgnoreCase("Mysql")){
+            dao = new DAOMysqlContenir();
+        }
+        return dao;
+	}
 }

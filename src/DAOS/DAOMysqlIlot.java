@@ -75,7 +75,7 @@ public class DAOMysqlIlot implements DAOIlot {
         return liste;
 	}
 
-	@Override
+	/*@Override
 	public int insert(Ilot i) throws Exception {
 	    String sql = "INSERT INTO Ilot (adresse,codepostal,ville,longitude,latitude,contact_id) "  + " VALUES( ";
         //connexion
@@ -94,9 +94,9 @@ public class DAOMysqlIlot implements DAOIlot {
         s.close();
         cnx.close();
         return n;
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public int update(Ilot i) throws Exception {
 	    String sql = "UPDATE Ilot SET ";
         //connexion
@@ -116,9 +116,9 @@ public class DAOMysqlIlot implements DAOIlot {
         s.close();
         cnx.close();
         return n;
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public int delete(Ilot i) throws Exception {
 	    String sql = "DELETE FROM Ilot WHERE id = '";
         Connection cnx = BDManager.getConnexion();
@@ -126,5 +126,5 @@ public class DAOMysqlIlot implements DAOIlot {
         sql += i.get_id() + "';";
         int n = s.executeUpdate(sql);
         return n;
-	}
+	}*/
 }

@@ -100,7 +100,7 @@ public class DAOMysqlConteneur implements DAOConteneur {
         return n;
     }
     
-    @Override
+    /*@Override
     public int delete(Conteneur c) throws Exception {
     	String sql = "DELETE FROM conteneur WHERE id = '";
         Connection cnx = BDManager.getConnexion();
@@ -108,5 +108,5 @@ public class DAOMysqlConteneur implements DAOConteneur {
         sql += c.get_id() + "';";
         int n = s.executeUpdate(sql);
         return n;
-    }
+    }*/
 }
