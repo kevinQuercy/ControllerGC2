@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 import data.Conteneur;
+import data.Historique;
 
 public class DAOMysqlConteneur implements DAOConteneur {
     
@@ -25,6 +26,9 @@ public class DAOMysqlConteneur implements DAOConteneur {
             //récupérer les champs
             h.set_id(r.getInt("id"));
             h.set_volumemax(r.getInt("volumemax"));
+            h.set_lastvolume(r.getInt("lastvolume"));
+            h.set_lastpoids(r.getInt("lastpoids"));
+            h.set_lastupdate(r.getDate("lastupdate"));
             h.set_Ilot_id(r.getInt("Ilot_id"));
             h.set_TypeDechets_id(r.getInt("TypeDechets_id"));
             //ajouter à la liste
@@ -59,19 +63,38 @@ public class DAOMysqlConteneur implements DAOConteneur {
 
     @Override
     public int update(Conteneur c) throws Exception {
-        String sql = "UPDATE conteneur " + " (id, volumemax,ilot_id, typedechets_id) " + " VALUES (" ;
+        String sql = "UPDATE conteneur SET " ;
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
-        sql += "'" + c.get_id() + "',";
-        sql += "'" + c.get_volumemax() + "',";
-        sql += c.get_Ilot_id() + ",";
-        sql += c.get_TypeDechets_id() + ") ";
-        sql += " WHERE reference = ' " + c.get_id() + "' ;";
+        sql += "volumemax='" + c.get_volumemax() + "',";
+        sql += "ilot_id='" + c.get_Ilot_id() + ",";
+        sql += "typedechets_id='" + c.get_TypeDechets_id() + "'";
+        sql += " WHERE id = '" + c.get_id() + "';";
 
         int n = s.executeUpdate(sql);
 
+        s.close();
+        cnx.close();
+        return n;
+    }
+    
+    public int majetat(Conteneur c) throws Exception {
+        String sql = "UPDATE conteneur SET " ;
+        //connexion
+        Connection cnx = BDManager.getConnexion();
+        //executer la requête
+        Statement s = cnx.createStatement();
+        sql += "lastvolume='" + c.get_lastvolume() + "',";
+        sql += "lastpoids='" + c.get_lastpoids() + "',";
+        java.text.SimpleDateFormat sdf =  new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sql += "lastupdate='" + sdf.format(c.get_lastupdate()) + "' ";
+        sql += " WHERE id = '" + c.get_id() + "' ;";
+        int n = s.executeUpdate(sql);
+        Historique h = new Historique(c.get_id(),c.get_lastupdate(),c.get_lastpoids(),c.get_lastvolume());
+        DAOHistorique daohistorique = DAOFactory.creerDAOHistorique();
+        daohistorique.insert(h);
         s.close();
         cnx.close();
         return n;

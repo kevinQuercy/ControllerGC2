@@ -28,6 +28,8 @@ public class DAOMysqlIlot implements DAOIlot {
             h.set_adresse(r.getString("adresse"));
             h.set_codepostal(r.getInt("codepostal"));
             h.set_ville(r.getString("ville"));
+            h.set_longitude(r.getDouble("longitude"));
+            h.set_latitude(r.getDouble("latitude"));
             h.set_Contact_id(r.getInt("contact_id"));
             //ajouter à la liste
             liste.add(h);
@@ -59,6 +61,8 @@ public class DAOMysqlIlot implements DAOIlot {
             h.set_adresse(r.getString("adresse"));
             h.set_codepostal(r.getInt("codepostal"));
             h.set_ville(r.getString("ville"));
+            h.set_longitude(r.getDouble("longitude"));
+            h.set_latitude(r.getDouble("latitude"));
             h.set_Contact_id(r.getInt("Contact_id"));
             //ajouter à la liste
             liste.add(h);
@@ -73,7 +77,7 @@ public class DAOMysqlIlot implements DAOIlot {
 
 	@Override
 	public int insert(Ilot i) throws Exception {
-	    String sql = "INSERT INTO Ilot " + " (adresse,codepostal,ville,contact_id) "  + " VALUES( ";
+	    String sql = "INSERT INTO Ilot (adresse,codepostal,ville,longitude,latitude,contact_id) "  + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
@@ -81,6 +85,8 @@ public class DAOMysqlIlot implements DAOIlot {
         sql += "'" + i.get_adresse() + "',";
         sql += "'" + i.get_codepostal() + "',";
         sql += "'" + i.get_ville() + "',";
+        sql += "'" + i.get_longitude() + "',";
+        sql += "'" + i.get_latitude() + "',";
         sql += "'" + i.get_Contact_id() + "')";
 
         int n = s.executeUpdate(sql);
@@ -92,16 +98,18 @@ public class DAOMysqlIlot implements DAOIlot {
 
 	@Override
 	public int update(Ilot i) throws Exception {
-	    String sql = "UPDATE Ilot " + " (adresse,codepostal,ville,contact_id) " + " VALUES (" ;
+	    String sql = "UPDATE Ilot SET ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
-        sql += "'" + i.get_adresse() + "',";
-        sql += "'" + i.get_codepostal() + "',";
-        sql += "'" + i.get_ville() + "',";
-        sql += "'" + i.get_Contact_id() +  "')";
-        sql += " WHERE reference = ' " + i.get_id() + "' ;";
+        sql += "adresse='" + i.get_adresse() + "',";
+        sql += "codepostal='" + i.get_codepostal() + "',";
+        sql += "ville='" + i.get_ville() + "',";
+        sql += "longitude='" + i.get_longitude() + "',";
+        sql += "latitude='" + i.get_latitude() + "',";
+        sql += "contact_id='" + i.get_Contact_id() +  "'";
+        sql += " WHERE id = ' " + i.get_id() + "' ;";
 
         int n = s.executeUpdate(sql);
 

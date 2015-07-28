@@ -7,4 +7,5 @@ public interface DAOConteneur {
     public int insert(Conteneur a) throws Exception;
     public int delete(Conteneur a) throws Exception;
     public int update(Conteneur a) throws Exception;
+    public int majetat(Conteneur a) throws Exception;
 }

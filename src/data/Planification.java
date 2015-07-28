@@ -39,6 +39,7 @@ public class Planification {
 		return this.itineraires;
 	}
 	public void ajouteritineraire(Itineraire i) {
+		i.set_date(this.get_datecreation());
 		this.itineraires.add(i);
 	}
 }

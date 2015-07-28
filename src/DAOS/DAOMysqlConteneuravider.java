@@ -48,7 +48,6 @@ public class DAOMysqlConteneuravider implements DAOConteneuravider {
         sql += "'" + c.get_Ilot_id() + "',";
         sql += "'" + c.get_Itineraire_id() + "',";
         sql += "'" + c.Conteneur_id() + "')";
-        System.out.println (sql);
         int n = s.executeUpdate(sql);
         
         s.close();

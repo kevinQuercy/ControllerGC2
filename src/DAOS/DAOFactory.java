@@ -45,4 +45,18 @@ public class DAOFactory {
         }
         return dao;
 	}
+	public static DAOIlot creerDAOIlot() {
+        DAOIlot dao = null;
+        if(typeBD.equalsIgnoreCase("Mysql")){
+            dao = new DAOMysqlIlot();
+        }
+        return dao;
+	}
+	public static DAOCamion creerDAOCamion() {
+        DAOCamion dao = null;
+        if(typeBD.equalsIgnoreCase("Mysql")){
+            dao = new DAOMysqlCamion();
+        }
+        return dao;
+	}
 }

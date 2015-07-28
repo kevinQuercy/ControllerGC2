@@ -2,6 +2,7 @@ package DAOS;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,14 +23,15 @@ public class DAOMysqlItineraire implements DAOItineraire {
         Statement s = cnx.createStatement();
         ResultSet r = s.executeQuery(sql);
 		DAOIlotdepassage daoIlotdepassage = DAOFactory.creerDAOIlotdepassage();
+		r.beforeFirst();
         //traiter les réponses
         while (r.next()) {
         	Itineraire h = new Itineraire();
-            //récupérer les champs
             h.set_id(r.getInt("id"));
             h.set_Camion_id(r.getInt("Camion_id"));
+            h.set_Planification_id(r.getInt("Planification_id"));
+            h.set_date(r.getDate("date"));
 			h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
-            //ajouter à la liste
             liste.add(h);
         }
         r.close();
@@ -40,17 +42,46 @@ public class DAOMysqlItineraire implements DAOItineraire {
 		
         return liste;
 	}
+	
+	public Itineraire selectbydateetcamion(Date d,int camionid) throws Exception {
+		// recuperation des itineraires
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	    String sql = "SELECT * FROM Itineraire WHERE date = '" + sdf.format(d) + "' AND Camion_id = '"+ camionid +"';";
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+		DAOIlotdepassage daoIlotdepassage = DAOFactory.creerDAOIlotdepassage();
+		r.beforeFirst();
+        //traiter les réponses
+        r.next();
+    	Itineraire h = new Itineraire();
+        h.set_id(r.getInt("id"));
+        h.set_Camion_id(r.getInt("Camion_id"));
+        h.set_Planification_id(r.getInt("Planification_id"));
+        h.set_date(r.getDate("date"));
+		h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
+        r.close();
+        s.close();
+        cnx.close();
+		
+		// Recuperation de la liste des Ilotsdepassage
+		
+        return h;
+	}
 
 	@Override
 	public int insert(Itineraire it) throws Exception {
-	    String sql = "INSERT INTO Itineraire " + " (Camion_id,Planification_id) " + " VALUES( ";
+	    String sql = "INSERT INTO Itineraire " + " (Camion_id,Planification_id,date) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
         sql += "'" + it.get_Camion_id() + "',";
-        sql += "'" + it.get_Planification_id() + "')";
-        System.out.println(sql);
+        sql += "'" + it.get_Planification_id() + "',";
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        sql += "'" + sdf.format(it.get_date()) + "')";
         int n = s.executeUpdate(sql,Statement.RETURN_GENERATED_KEYS);
         ResultSet id = s.getGeneratedKeys();
         int lastid = 1;

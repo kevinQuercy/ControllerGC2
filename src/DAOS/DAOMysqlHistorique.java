@@ -72,7 +72,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
 
     @Override
     public int insert(Historique h) throws Exception {
-        String sql = "INSERT INTO Historique " + " (conteneur_id,date,poids,volume) " + " VALUES( ";
+        String sql = "INSERT INTO Historique (conteneur_id,date,poids,volume) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
@@ -90,7 +90,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
         return n;
     }
 
-    @Override
+    /*@Override
     public int update(Historique h) throws Exception {
         String sqlUpdate = "UPDATE Historique " + " (conteneur_id,date,poids,volume) " + " VALUES (" ;
         //connexion
@@ -109,7 +109,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
         s.close();
         cnx.close();
         return n;
-    }
+    }*/
     
     @Override
     public int delete(Historique h) throws Exception {

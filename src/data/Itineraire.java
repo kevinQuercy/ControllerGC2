@@ -1,5 +1,6 @@
 package data;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import data.Ilotdepassage;
@@ -8,6 +9,7 @@ public class Itineraire {
 	private int id;
 	private int Camion_id;
 	private int Planification_id;
+	private Date date;
 	private List<Ilotdepassage> ilotsdepassage;
 
 	public Itineraire(){
@@ -22,6 +24,9 @@ public class Itineraire {
 	public int get_Planification_id() {
 		return this.Planification_id;
 	}
+	public Date get_date() {
+		return this.date;
+	}
 	public List<Ilotdepassage> get_ilotsdepassage() {
 		return this.ilotsdepassage;
 	}
@@ -33,6 +38,9 @@ public class Itineraire {
 	}
 	public void set_Planification_id(int a) {
 		this.Planification_id=a;
+	}
+	public void set_date(Date a) {
+		this.date=a;
 	}
 	public void set_ilotsdepassage(List<Ilotdepassage> li) {
 		this.ilotsdepassage = li;

@@ -8,8 +8,9 @@ public class Conteneuravider {
 
 	public Conteneuravider() {
 	}
-	public Conteneuravider(int a) {
-		this.Conteneur_id=a;
+	public Conteneuravider(int id,int ilot) {
+		this.Conteneur_id=id;
+		this.Ilot_id=ilot;
 	}
 	public void set_Conteneur_id(int a) {
 		this.Conteneur_id=a;

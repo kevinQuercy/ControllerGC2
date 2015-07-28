@@ -53,14 +53,12 @@ public class DAOMysqlIlotdepassage implements DAOIlotdepassage {
         sql += "'" + it.get_Itineraire_id() + "',";
         sql += "'" + it.get_Ilot_id() + "',";
         sql += "'" + it.get_ordre() + "')";
-        System.out.println(sql);
         int n = s.executeUpdate(sql);
         List<Conteneuravider> lcav = it.get_conteneuravider();
         DAOConteneuravider daoconteneuravider = DAOFactory.creerDAOConteneuravider();
         for (int i = 0 ; i < lcav.size(); i++) {
         	Conteneuravider c = lcav.get(i);
         	c.set_Itineraire_id(it.get_Itineraire_id());
-        	c.set_Ilot_id(it.get_Ilot_id());
         	daoconteneuravider.insert(c);
         }
         s.close();

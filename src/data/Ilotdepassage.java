@@ -42,7 +42,7 @@ public class Ilotdepassage {
 	public void set_conteneuravider(List<Conteneuravider> l) {
 		this.conteneuravider = l;
 	}
-	public void ajouterconteneur(Conteneuravider c) {
-		this.conteneuravider.add(c);
+	public void ajouterconteneur(int idcont) {
+		this.conteneuravider.add(new Conteneuravider(idcont,this.get_Ilot_id()));
 	}
 }

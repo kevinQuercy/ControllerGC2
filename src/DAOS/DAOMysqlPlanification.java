@@ -15,7 +15,7 @@ public class DAOMysqlPlanification implements DAOPlanification {
 	@Override
 	public Planification selectbydate(Date d) throws Exception {
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-	    String sql = "SELECT * FROM Ilotdepassage where date = '" + sdf.format(d) + "';";
+	    String sql = "SELECT * FROM Planification where datecreation = '" + sdf.format(d) + "';";
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
         //faire la requête
@@ -23,6 +23,8 @@ public class DAOMysqlPlanification implements DAOPlanification {
         ResultSet r = s.executeQuery(sql);
         //traiter les réponses
 		Planification pl = new Planification();
+		r.beforeFirst();
+		r.next();
         pl.set_id(r.getInt("id"));
 		pl.set_datecreation(r.getDate("datecreation"));
 		pl.set_taux(r.getInt("taux"));
@@ -74,6 +76,29 @@ public class DAOMysqlPlanification implements DAOPlanification {
 	    String sql = "DELETE FROM Planification  WHERE id = '" + plid + "';";
         Connection cnx = BDManager.getConnexion();
         Statement s = cnx.createStatement();
+        int n = s.executeUpdate(sql);
+        return n;
+	}
+	
+	@Override
+	public int deletebydate(Date d) throws Exception {
+		// recherche de l'ID de la planification
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+		String sql = "SELECT id FROM Planification  WHERE datecreation = '" + sdf.format(d) + "';";
+        Connection cnx = BDManager.getConnexion();
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+        r.beforeFirst();
+        r.next();
+        int idplanif = r.getInt("id");
+		// delete de tous les itineraires
+		DAOItineraire daoItineraire = DAOFactory.creerDAOItineraire();
+		List<Itineraire> itineraires = daoItineraire.selectbyplanificationid(idplanif);
+		for( int i = 0 ; i < itineraires.size() ; i++ ) {
+			daoItineraire.delete(itineraires.get(i));
+		}
+		// delete de la planification
+	    sql = "DELETE FROM Planification  WHERE datecreation = '" + sdf.format(d) + "';";
         int n = s.executeUpdate(sql);
         return n;
 	}

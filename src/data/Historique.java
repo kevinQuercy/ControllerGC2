@@ -8,6 +8,14 @@ public class Historique {
 	private int poids;
 	private int volume;
 
+	public Historique(int contid,Date d,int p,int v) {
+		this.Conteneur_id=contid;
+		this.date=d;
+		this.poids=p;
+		this.volume=v;
+	}
+	public Historique(){
+	}
 	public int get_id() {
 		return this.id;
 	}

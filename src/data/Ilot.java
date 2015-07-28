@@ -5,6 +5,8 @@ public class Ilot {
 	private String adresse;
 	private int codepostal;
 	private String ville;
+	private Double longitude;
+	private Double latitude;
 	private int Contact_id;
 
 	public int get_id() {
@@ -18,6 +20,12 @@ public class Ilot {
 	}
 	public String get_ville() {
 		return this.ville;
+	}
+	public Double get_longitude() {
+		return this.longitude;
+	}
+	public Double get_latitude() {
+		return this.latitude;
 	}
 	public int get_Contact_id() {
 		return this.Contact_id;
@@ -33,6 +41,12 @@ public class Ilot {
 	}
 	public void set_ville(String a) {
 		this.ville=a;
+	}
+	public void set_longitude(Double a) {
+		this.longitude=a;
+	}
+	public void set_latitude(Double a) {
+		this.latitude=a;
 	}
 	public void set_Contact_id(int a) {
 		this.Contact_id=a;
