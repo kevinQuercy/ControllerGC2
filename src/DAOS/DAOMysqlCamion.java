@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import data.Camion;
-import data.Conteneur;
 
 public class DAOMysqlCamion implements DAOCamion{
 
