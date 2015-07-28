@@ -42,7 +42,7 @@ public class DAOMysqlConteneur implements DAOConteneur {
         return liste;
     }
 
-    @Override
+    /*@Override
     public int insert(Conteneur c) throws Exception {
         String sql = "INSERT INTO conteneur " + " (id, volumemax, ilot_id, typedechets_id) " + " VALUES( ";
         //connexion
@@ -52,7 +52,7 @@ public class DAOMysqlConteneur implements DAOConteneur {
         sql += "'" + c.get_id() + "',";
         sql += "'" + c.get_volumemax() + "',";
         sql += "'" + c.get_Ilot_id() + "',";
-        sql += c.get_TypeDechets_id() + ");";
+        sql += "'" + c.get_TypeDechets_id() + ");";
 
         int n = s.executeUpdate(sql);
 
@@ -78,7 +78,7 @@ public class DAOMysqlConteneur implements DAOConteneur {
         s.close();
         cnx.close();
         return n;
-    }
+    }*/
     
     public int majetat(Conteneur c) throws Exception {
         String sql = "UPDATE conteneur SET " ;
