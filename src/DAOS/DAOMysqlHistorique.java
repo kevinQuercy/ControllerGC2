@@ -73,7 +73,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
     
     @Override
     public Date selectderniervidage(int c) throws Exception {
-    	String sql = "SELECT date FROM Historique WHERE Conteneur_id ='1' AND volume='0' AND poids='0';";
+    	String sql = "SELECT MAX(date) FROM Historique WHERE Conteneur_id ='"+c+"' AND volume='0' AND poids='0';";
         List<Historique> liste = new LinkedList<Historique>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
@@ -101,7 +101,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
         sql += "'" + sdf.format(h.get_date()) + "',";
         sql += "'" + h.get_poids() + "',";
         sql += "'" + h.get_volume() + "')";
-		// System.out.println ("\nsql :" + sqlInsert + "\n");
+		//System.out.println ("\nsql :" + sql + "\n");
         int n = s.executeUpdate(sql);
 
         s.close();

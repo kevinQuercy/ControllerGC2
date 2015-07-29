@@ -52,6 +52,7 @@ public class Ilotsglobalsavider {
 							// on verifie qu'il a été vidé durant le temps indiqué
 							DAOHistorique daohistorique = DAOFactory.creerDAOHistorique();
 							if(daohistorique.selectderniervidage(cont.get(l).get_id()).before(datelimite) ) {
+								System.out.println(daohistorique.selectderniervidage(cont.get(l).get_id()));
 								passageoblige=true;
 							}
 						}
