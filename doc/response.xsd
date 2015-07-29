@@ -9,6 +9,31 @@
   </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="container_sets_circuit"><!-- list of container_sets, for circuit responses -->
+  <xs:sequence>
+	<xs:element name="container_set" maxOccurs="unbounded">
+	  <xs:complexType>
+	    <xs:sequence>
+		  <xs:element name="location" type="location"/>
+		  <xs:element name="containers">
+			<xs:complexType>
+			  <xs:sequence>
+				<xs:element name="container" maxOccurs="unbounded">
+				  <xs:complexType>
+					<xs:sequence>
+					  <xs:element name="id" type="xs:integer"/>
+					</xs:sequence>
+				  </xs:complexType>
+				</xs:element>
+			  </xs:sequence>
+			</xs:complexType>
+		  </xs:element>
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
+  </xs:sequence>
+</xs:complexType>
+
 <!-- response content for RESP_SUPERVISION_STATE -->
 <xs:element name="supervision_state">
   <xs:complexType>
@@ -55,32 +80,8 @@
   <xs:complexType>
     <xs:sequence>
 	  <xs:element name="index" type="xs:integer"/><!-- 0 to N-1 -->
-      <xs:element name="container_sets">
-		<xs:complexType>
-		  <xs:sequence>
-			<xs:element name="container_set" maxOccurs="unbounded">
-			  <xs:complexType>
-			    <xs:sequence>
-				  <xs:element name="location" type="location"/>
-				  <xs:element name="containers">
-					<xs:complexType>
-					  <xs:sequence>
-						<xs:element name="container" maxOccurs="unbounded">
-						  <xs:complexType>
-							<xs:sequence>
-							  <xs:element name="id" type="xs:integer"/>
-							</xs:sequence>
-						  </xs:complexType>
-						</xs:element>
-					  </xs:sequence>
-					</xs:complexType>
-				  </xs:element>
-			    </xs:sequence>
-			  </xs:complexType>
-			</xs:element>
-		  </xs:sequence>
-		</xs:complexType>
-	  </xs:element>
+	  <xs:element name="depot_location" type="location"/>
+      <xs:element name="container_sets" type="container_sets_circuit"/>
     </xs:sequence>
   </xs:complexType>
 </xs:element>
@@ -90,6 +91,13 @@
   <xs:complexType>
     <xs:sequence>
 	  <xs:element ref="circuit" maxOccurs="unbounded"/>
+	  <xs:element name="not_collected">
+		<xs:complexType>
+		  <xs:sequence>
+			<xs:element name="container_sets" type="container_sets_circuit"/>
+		  </xs:sequence>
+		</xs:complexType>
+	  </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:element>

@@ -29,6 +29,7 @@ public class ContainerSystem {
 	private GeoCoordinate depot;
 	private int nbVehicles;
 	private List<List<ContainerSet>> collectRoutes;
+	private List<ContainerSet> notCollected;
 	
 	private ContainerSystem() {
 		super();
@@ -37,6 +38,7 @@ public class ContainerSystem {
 		depot = null;
 		nbVehicles = 0;
 		collectRoutes = null;
+		notCollected = null;
 	}
 	
 	public List<ContainerSet> getContainerSets() {
@@ -63,6 +65,10 @@ public class ContainerSystem {
 		return collectRoutes;
 	}
 
+	public List<ContainerSet> getNotCollected() {
+		return notCollected;
+	}
+
 	/** add containerSet to the system
 	 * @note containerSet shall already contains its containers
 	 */ 
@@ -80,8 +86,16 @@ public class ContainerSystem {
 	}
 	
 	public synchronized void trigCircuitComputation() {
+		notCollected = new ArrayList<>();
+
 		// get container sets to collect
-		List<ContainerSet> containersToCollect = readyForCollect();
+		List<ContainerSet> containersToCollect = new ArrayList<>();
+		for (ContainerSet containerSet: containerSets) {
+			if (containerSet.isReadyForCollect())
+				containersToCollect.add(containerSet);
+			else
+				notCollected.add(containerSet);
+		}
 		
 		// determine circuits
 		Graph graph = buildGraph(containersToCollect);
@@ -99,16 +113,6 @@ public class ContainerSystem {
 					collectRoute.add(csNode.containerSet);
 			}
 		}
-	}
-	
-	// Get the list of ContainerSet ready for collect
-	private List<ContainerSet> readyForCollect() {
-		List<ContainerSet> result = new ArrayList<>();
-		for (ContainerSet containerSet: containerSets) {
-			if (containerSet.isReadyForCollect())
-				result.add(containerSet);
-		}
-		return result;
 	}
 	
 	private static class ContainerSetGraphNode extends GraphNode {

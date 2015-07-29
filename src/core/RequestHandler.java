@@ -1,5 +1,6 @@
 package core;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.jdom2.Document;
@@ -121,7 +122,7 @@ public class RequestHandler {
 			Element eltContainerSet = new Element("container_set");
 			eltContainerSets.addContent(eltContainerSet);
 			
-			addLocation(eltContainerSet, cs.getLocation());
+			addLocation(eltContainerSet, "location", cs.getLocation());
 			addFieldBool(eltContainerSet, "to_be_collected", cs.isReadyForCollect());
 			
 			Element eltContainers = new Element("containers");
@@ -145,8 +146,8 @@ public class RequestHandler {
 		buildResponseType(rootResp, "OK");
 	}
 	
-	private static void addLocation(Element eltRoot, GeoCoordinate geoCoord) {
-		Element eltLocation = new Element("location");
+	private static void addLocation(Element eltRoot, String fieldname, GeoCoordinate geoCoord) {
+		Element eltLocation = new Element(fieldname);
 		eltRoot.addContent(eltLocation);
 		addFieldDouble(eltLocation, "latitude", geoCoord.getLatitude());
 		addFieldDouble(eltLocation, "longitude", geoCoord.getLongitude());
@@ -160,6 +161,10 @@ public class RequestHandler {
 		for (int i = 0; i < ContainerSystem.getContainerSystem().getCollectRoutes().size(); i++) {
 			eltCircuits.addContent(getCircuit(i));
 		}
+
+		Element eltNotCollected = new Element("not_collected");
+		eltCircuits.addContent(eltNotCollected);
+		eltNotCollected.addContent(getContainerSets(ContainerSystem.getContainerSystem().getNotCollected()));
 	}
 	
 	private void handleReqCircuit(Element rootReq, Element rootResp) {
@@ -177,14 +182,20 @@ public class RequestHandler {
 	private Element getCircuit(int circuitIndex) {
 		Element eltCircuit = new Element("circuit");
 		addFieldInt(eltCircuit, "index", circuitIndex);
-		Element eltContainerSets = new Element("container_sets");
+		addLocation(eltCircuit, "depot_location", ContainerSystem.getContainerSystem().getDepot());
+		Element eltContainerSets = getContainerSets(ContainerSystem.getContainerSystem().getCollectRoutes().get(circuitIndex)); 
 		eltCircuit.addContent(eltContainerSets);
+		return eltCircuit;
+	}
+	
+	private Element getContainerSets(List<ContainerSet> containerSets) {
+		Element eltContainerSets = new Element("container_sets");
 		
-		for (ContainerSet containerSet: ContainerSystem.getContainerSystem().getCollectRoutes().get(circuitIndex)) {
+		for (ContainerSet containerSet: containerSets) {
 			Element eltContainerSet = new Element("container_set");
 			eltContainerSets.addContent(eltContainerSet);
 			
-			addLocation(eltContainerSet, containerSet.getLocation());
+			addLocation(eltContainerSet, "location", containerSet.getLocation());
 			
 			Element eltContainers = new Element("containers");
 			eltContainerSet.addContent(eltContainers);
@@ -195,7 +206,7 @@ public class RequestHandler {
 				addFieldInt(eltContainer, "id", container.getContainerId());
 			}
 		}
-		return eltCircuit;
+		return eltContainerSets;
 	}
 	
 	private void buildResponseType(Element rootResp, String responseType) {
