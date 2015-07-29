@@ -1,4 +1,5 @@
 package core;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +9,16 @@ import data.*;
 public class DAOExample {
 
 	public static void main(String[] args) throws Exception {
-
+		
+		
+		/*DAOHistorique daohistorique = DAOFactory.creerDAOHistorique();
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -5);
+		Date datelimite = cal.getTime();
+		for (int i = 1 ; i < 107 ; i++){
+			Historique h = new Historique(i,datelimite,0,0);
+			daohistorique.insert(h);
+		}*/
 		//////////////////////////////////////////////////////////////////////
 		// Creation d'une planification
 		//////////////////////////////////////////////////////////////////////
@@ -134,7 +144,7 @@ public class DAOExample {
 		
 		System.out.println ("\nMise à jour l'etat d'un conteneur\n");
 		Conteneur c = new Conteneur(1);
-		c.majetat(40,40);
+		c.majetat(0,0);
 		DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
 		daoconteneur.majetat(c);
 		System.out.println ("\nFin\n");
@@ -157,8 +167,11 @@ public class DAOExample {
 		// Creer l'etat global
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nCreer l'etat global\n");
-		Etatglobal etatglobal = new Etatglobal(60);
+		System.out.println ("\nCreer ilotsglobalavider\n");
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -3);
+		Date datelimite = cal.getTime();
+		Ilotsglobalsavider etatglobal = new Ilotsglobalsavider(60,datelimite);
 
 		System.out.println ("\nAfficher l'etat global\n");
 		List<Ilotsavider> ilotsavider = etatglobal.get_ilotsavider();

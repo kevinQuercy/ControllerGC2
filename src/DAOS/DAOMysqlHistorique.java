@@ -3,6 +3,7 @@ import DAOS.DAOHistorique;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import data.Historique;
@@ -68,6 +69,24 @@ public class DAOMysqlHistorique implements DAOHistorique {
         cnx.close();
 
         return liste;
+    }
+    
+    @Override
+    public Date selectderniervidage(int c) throws Exception {
+    	String sql = "SELECT date FROM Historique WHERE Conteneur_id ='1' AND volume='0' AND poids='0';";
+        List<Historique> liste = new LinkedList<Historique>();
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+        r.next();
+        Date d = r.getTimestamp(1);
+        r.close();
+        s.close();
+        cnx.close();
+
+        return d;
     }
 
     @Override

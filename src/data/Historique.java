@@ -4,7 +4,7 @@ import java.util.Date;
 public class Historique {
 	private int id;
 	private int Conteneur_id;
-	private Date date = new java.util.Date(); ;
+	private Date date;
 	private int poids;
 	private int volume;
 
