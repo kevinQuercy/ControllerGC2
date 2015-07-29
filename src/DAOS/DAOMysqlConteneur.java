@@ -3,8 +3,11 @@ import DAOS.DAOConteneur;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimerTask;
+
 import data.Conteneur;
 import data.Historique;
 
@@ -28,7 +31,38 @@ public class DAOMysqlConteneur implements DAOConteneur {
             h.set_volumemax(r.getInt("volumemax"));
             h.set_lastvolume(r.getInt("lastvolume"));
             h.set_lastpoids(r.getInt("lastpoids"));
-            h.set_lastupdate(r.getDate("lastupdate"));
+            h.set_lastupdate(r.getTimestamp("lastupdate"));
+            h.set_Ilot_id(r.getInt("Ilot_id"));
+            h.set_TypeDechets_id(r.getInt("TypeDechets_id"));
+            //ajouter à la liste
+            liste.add(h);
+        }
+        
+        r.close();
+        s.close();
+        cnx.close();
+
+        return liste;
+    }
+    
+    public List<Conteneur> selectbyilotid(int id) throws Exception {
+        String sql = "SELECT * FROM conteneur where Ilot_id = "+id+";";
+        List<Conteneur> liste = new LinkedList<Conteneur>();
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+
+        //traiter les réponses
+        while (r.next()) {
+        	Conteneur h = new Conteneur();
+            //récupérer les champs
+            h.set_id(r.getInt("id"));
+            h.set_volumemax(r.getInt("volumemax"));
+            h.set_lastvolume(r.getInt("lastvolume"));
+            h.set_lastpoids(r.getInt("lastpoids"));
+            h.set_lastupdate(r.getTimestamp("lastupdate"));
             h.set_Ilot_id(r.getInt("Ilot_id"));
             h.set_TypeDechets_id(r.getInt("TypeDechets_id"));
             //ajouter à la liste
@@ -99,7 +133,7 @@ public class DAOMysqlConteneur implements DAOConteneur {
         cnx.close();
         return n;
     }
-    
+
     /*@Override
     public int delete(Conteneur c) throws Exception {
     	String sql = "DELETE FROM conteneur WHERE id = '";

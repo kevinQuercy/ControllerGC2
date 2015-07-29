@@ -22,7 +22,7 @@ public class DAOMysqlCamion implements DAOCamion{
         
         //traiter les réponses
         while (r.next()) {
-            liste.add(new Camion(r.getInt("id"),r.getInt("poidsmax"),r.getBoolean("disponible")));
+            liste.add(new Camion(r.getInt("id"),r.getInt("poidsmax"),r.getInt("volumemax"),r.getInt("Typedechets_id"),r.getBoolean("disponible")));
         }
 
         r.close();
@@ -32,6 +32,27 @@ public class DAOMysqlCamion implements DAOCamion{
         return liste;
 	}
 
+	@Override
+	public List<Camion> selectdisponible() throws Exception {
+        String sql = "SELECT * FROM camion WHERE disponible = '1';";
+        List<Camion> liste = new LinkedList<Camion>();
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+        
+        //traiter les réponses
+        while (r.next()) {
+            liste.add(new Camion(r.getInt("id"),r.getInt("poidsmax"),r.getInt("volumemax"),r.getInt("Typedechets_id"),r.getBoolean("disponible")));
+        }
+
+        r.close();
+        s.close();
+        cnx.close();
+
+        return liste;
+	}
 	/*@Override
 	public int insert(Camion c) throws Exception {
         //connexion
@@ -55,7 +76,7 @@ public class DAOMysqlCamion implements DAOCamion{
 	}*/
 
 	@Override
-	public int update(Camion c) throws Exception {
+	public int updatedisponible(Camion c) throws Exception {
         String sql = "UPDATE camion SET " ;
         //connexion
         Connection cnx = BDManager.getConnexion();

@@ -7,7 +7,7 @@ import data.Itineraire;
 
 public class Planification {
 	private int id;
-	private Date datecreation;
+	private Date date;
 	private int taux;
 	private List<Itineraire> itineraires;
 
@@ -17,8 +17,8 @@ public class Planification {
 	public void set_id(int a) {
 		this.id=a;
 	}
-	public void set_datecreation(Date a) {
-		this.datecreation=a;
+	public void set_date(Date a) {
+		this.date=a;
 	}
 	public void set_taux(int a) {
 		this.taux=a;
@@ -29,8 +29,8 @@ public class Planification {
 	public int get_id() {
 		return this.id;
 	}
-	public Date get_datecreation() {
-		return this.datecreation;
+	public Date get_date() {
+		return this.date;
 	}
 	public int get_taux() {
 		return this.taux;
@@ -39,7 +39,7 @@ public class Planification {
 		return this.itineraires;
 	}
 	public void ajouteritineraire(Itineraire i) {
-		i.set_date(this.get_datecreation());
+		i.set_Planification_date(this.get_date());
 		this.itineraires.add(i);
 	}
 }

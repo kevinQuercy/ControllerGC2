@@ -14,37 +14,50 @@ public class DAOExample {
 		//////////////////////////////////////////////////////////////////////
 		
 		System.out.println ("\nCreation d'une planification\n");
-		System.out.println ("Creation de 3 Ilotsde passage avec 3 Conteneurs a vider\n");
-		Ilotdepassage ilot1 = new Ilotdepassage(1,1);
-		ilot1.ajouterconteneur(1);
-		ilot1.ajouterconteneur(2);
-		ilot1.ajouterconteneur(3);
-		Ilotdepassage ilot2 = new Ilotdepassage(2,2);
-		ilot2.ajouterconteneur(4);
-		ilot2.ajouterconteneur(5);
-		ilot2.ajouterconteneur(6);
-		Ilotdepassage ilot3 = new Ilotdepassage(3,3);
-		ilot3.ajouterconteneur(7);
-		ilot3.ajouterconteneur(8);
-		ilot3.ajouterconteneur(9);
-		System.out.println ("Creation de 2 Itinenaires\n");
-		Itineraire it1 = new Itineraire();
-		it1.ajouterilot(ilot1);
-		it1.ajouterilot(ilot2);
-		it1.ajouterilot(ilot3);
-		it1.set_Camion_id(1);
-		Itineraire it2 = new Itineraire();
-		it2.ajouterilot(ilot1);
-		it2.ajouterilot(ilot2);
-		it2.ajouterilot(ilot3);
-		it2.set_Camion_id(2);
-		System.out.println ("Creation de 1 Planification\n");
+		DAOIlot daoilot = DAOFactory.creerDAOIlot();
+		System.out.println ("Creation de 3 itineraires");
+		System.out.println ("  Creation de l'itineraire 1 pour le camion 2");
+		Itineraire it1 = new Itineraire(1,2);
+		System.out.println ("    Ajout de l'ilot 1 avec l'ordre 1");
+		it1.ajouterilot(daoilot.selectbyid(1),1);
+		System.out.println ("    Ajout de l'ilot 2 avec l'ordre 2");
+		it1.ajouterilot(daoilot.selectbyid(2),2);
+		System.out.println ("    Ajout de l'ilot 3 avec l'ordre 3");
+		it1.ajouterilot(daoilot.selectbyid(3),3);
+		System.out.println ("    Ajout de la longueur à 10 000 m");
+		it1.set_longueur(10000);
+		System.out.println ("  Creation de l'itineraire 2 pour le camion 4");
+		Itineraire it2 = new Itineraire(2,4);
+		System.out.println ("    Ajout de l'ilot 4 avec l'ordre 1");
+		it2.ajouterilot(daoilot.selectbyid(4),1);
+		System.out.println ("    Ajout de l'ilot 5 avec l'ordre 1");
+		it2.ajouterilot(daoilot.selectbyid(5),2);
+		System.out.println ("    Ajout de l'ilot 6 avec l'ordre 1");
+		it2.ajouterilot(daoilot.selectbyid(6),3);
+		System.out.println ("    Ajout de la longueur à 14 000 m");
+		it2.set_longueur(14000);
+		System.out.println ("  Creation de l'itineraire 3 pour le camion 6");
+		Itineraire it3 = new Itineraire(3,6);
+		System.out.println ("    Ajout de l'ilot 7 avec l'ordre 1");
+		it3.ajouterilot(daoilot.selectbyid(7),1);
+		System.out.println ("    Ajout de l'ilot 8 avec l'ordre 1");
+		it3.ajouterilot(daoilot.selectbyid(8),2);
+		System.out.println ("    Ajout de l'ilot 9 avec l'ordre 1");
+		it3.ajouterilot(daoilot.selectbyid(9),3);
+		System.out.println ("    Ajout de la longueur à 12 000 m");
+		it3.set_longueur(12000);
+		System.out.println ("\nCreation de 1 Planification");
 		Planification planif = new Planification();
-		planif.set_datecreation(new Date());
+		planif.set_date(new Date());
+		System.out.println ("  Ajout de l'itineraire 1");
 		planif.ajouteritineraire(it1);
+		System.out.println ("  Ajout de l'itineraire 2");
 		planif.ajouteritineraire(it2);
+		System.out.println ("  Ajout de l'itineraire 3");
+		planif.ajouteritineraire(it3);
+		System.out.println ("  Set du taux");
 		planif.set_taux(50);
-		System.out.println ("Fin de la planification\n");
+		System.out.println ("\nFin de la planification\n");
 
 		//////////////////////////////////////////////////////////////////////
 		// Sauvegarde d'une planification
@@ -63,12 +76,11 @@ public class DAOExample {
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		System.out.println ("\nSuppression de la planification du : " + sdf.format(new Date()) + "\n");
 		daoplanification.deletebydate(new Date());*/
-		
 		//////////////////////////////////////////////////////////////////////
 		// Affichage d'une planification
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nAffichage d'une Planification\n");
+		/*System.out.println ("\nAffichage d'une Planification\n");
 		DAOPlanification daoplanification2 = DAOFactory.creerDAOPlanification();
 		Planification pla = daoplanification2.selectbydate(new Date());
 		System.out.println ("id : " + pla.get_id());
@@ -95,7 +107,7 @@ public class DAOExample {
 				}
 			}
 		}
-		System.out.println ("\nFin de l'affichage\n");
+		System.out.println ("\nFin de l'affichage\n");*/
 		
 		//////////////////////////////////////////////////////////////////////
 		// Get d'un itineraire par Camion_id et Date
@@ -106,18 +118,13 @@ public class DAOExample {
 		Itineraire iti = daoitineraire.selectbydateetcamion(new Date(), 2);
 		System.out.println ("  id : " + iti.get_id());
 		System.out.println ("  Camion_id: " + iti.get_Camion_id());
-		System.out.println ("  Planification_id : " + iti.get_Planification_id());
-		System.out.println ("  Date : " + iti.get_date());
+		System.out.println ("  Planification_id : " + iti.get_Planification_date());
+		System.out.println ("  Longueur : " + iti.get_longueur());
 		List<Ilotdepassage> ilots = iti.get_ilotsdepassage();
 		System.out.println ("\n  Nombre d'ilots : " + ilots.size());
 		for ( int jj = 0 ; jj < ilots.size(); jj++ ) {
 			Ilotdepassage il = ilots.get(jj);
-			List<Conteneuravider> cav = il.get_conteneuravider();
-			System.out.print ("\n    Ilots : " + il.get_Ilot_id() + " | Ordre : " + il.get_ordre() + " | Itineraire : " + il.get_Itineraire_id() + " | Nombre de conteneur à vider : " + cav.size() + "\n");
-			for ( int jjj = 0 ; jjj < cav.size(); jjj++ ) {
-				Conteneuravider c = cav.get(jjj);
-				System.out.println ("      Conteneur : " + c.Conteneur_id() + " | Ilot : " + c.get_Ilot_id() + " | Itineraire : " + c.get_Itineraire_id());
-			}
+			System.out.print ("\n    Ilots : " + il.get_Ilot().get_id() + " | Ordre : " + il.get_ordre() + " | Itineraire : " + il.get_Itineraire_id());
 		}
 		System.out.println ("\nFin\n");
 		
@@ -136,7 +143,7 @@ public class DAOExample {
 		// Recuperer tous les conteneurs
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nRecuperer tous les conteneurs\n");
+		/*System.out.println ("\nRecuperer tous les conteneurs\n");
 		DAOConteneur daoconteneur3 = DAOFactory.creerDAOConteneur();
 		List<Conteneur> lc = daoconteneur3.select();
 		for ( int i = 0 ; i < lc.size(); i++ ) {
@@ -144,95 +151,91 @@ public class DAOExample {
 			c2 = lc.get(i);
 			System.out.println ("id : " + c2.get_id() + " | ilot : " + c2.get_Ilot_id() + " | Volume max : " + c2.get_volumemax() + " | Type dechets : " + c2.get_TypeDechets_id() + " | last update : " + c2.get_lastupdate() + " | last poids : " + c2.get_lastpoids() + " | last volume : " + c2.get_lastvolume());
 		}
-		System.out.println ("\nFin\n");
+		System.out.println ("\nFin\n");*/
 		
 		//////////////////////////////////////////////////////////////////////
-		// Recuperer tous les ilots
+		// Creer l'etat global
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nRecuperer tous les ilots\n");
-		DAOIlot daoilot = DAOFactory.creerDAOIlot();
-		List<Ilot> li = daoilot.select();
-		for ( int j = 0 ; j < li.size(); j++ ) {
+		System.out.println ("\nCreer l'etat global\n");
+		Etatglobal etatglobal = new Etatglobal(60);
+
+		System.out.println ("\nAfficher l'etat global\n");
+		List<Ilotsavider> ilotsavider = etatglobal.get_ilotsavider();
+		System.out.println ("Nombre de type de dechets : " + ilotsavider.size()+"\n");
+		for (int i = 0 ; i < ilotsavider.size() ; i++ ) {
+			Ilotsavider il = ilotsavider.get(i);
+			System.out.println ("Type de dechets : " + il.get_typedechets());
+			System.out.println ("Nombre de camions disponibles : " + il.get_camions().size());
+			System.out.println ("Nombre d'ilots à vider : " + il.get_ilots().size());
+			System.out.print ("Ilots : ");
+			for (int j = 0 ; j < il.get_ilots().size() ; j++ ) {
+				System.out.print(il.get_ilots().get(j).get_id() + " ");
+			}
+			System.out.print ("\n\n");
+		}
+		
+		// Pour tous les types de dechets creer une liste d'ilots
+		/*for ( int j = 0 ; j < li.size(); j++ ) {
 			Ilot ilot = li.get(j);
 			System.out.println ("id : " + ilot.get_id() + " | Adresse : " + ilot.get_adresse() + " | Code postal : " + ilot.get_codepostal() + " | Ville : " + ilot.get_ville() + " | Longitude : " + ilot.get_longitude() + " | Latitude : " + ilot.get_latitude() + " | Contact id : " + ilot.get_Contact_id());
+			List<Conteneur> lcont = ilot.get_conteneurs();
+			for (int clcont = 0 ; clcont < lcont.size() ; clcont++) {
+				Conteneur cc = lcont.get(clcont);
+				System.out.println ("  Conteneur : " + cc.get_id() + " | Ilot_id : " + cc.get_Ilot_id() + " | Volume max : " + cc.get_volumemax() + " | Last volume : " + cc.get_lastvolume() + " | Last poids : " + cc.get_lastpoids() + " | Last update : " + cc.get_lastupdate() + " | Typedechets_id : " + cc.get_TypeDechets_id());
+			}
 		}
-		System.out.println ("\nFin\n");
+		System.out.println ("\nFin\n");*/
 		
 		//////////////////////////////////////////////////////////////////////
 		// Recuperer tous les camions
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nRécuperer tous les camions\n");
+		/*System.out.println ("\nRécuperer tous les camions\n");
 		DAOCamion daocamion = DAOFactory.creerDAOCamion();
 		List<Camion> lcam = daocamion.select();
 		for ( int jrr = 0 ; jrr < lcam.size(); jrr++ ) {
 			Camion camion = lcam.get(jrr);
 			System.out.println ("id : " + camion.get_id() + " | Poids max : " + camion.get_poidsmax() + " | Disponible : " + camion.get_disponible());
 		}
-		System.out.println ("\nFin\n");
+		System.out.println ("\nFin\n");*/
 		
 		//////////////////////////////////////////////////////////////////////
 		// Changer état d'un camion
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nChanger état d'un camion\n");
+		/*System.out.println ("\nChanger état d'un camion\n");
 		boolean dispo = true;
 		Camion camionachanger = new Camion(1,19,dispo);
 		System.out.println ("Camion 1 : disponible à "+dispo);
 		DAOCamion daocamion3 = DAOFactory.creerDAOCamion();
 		daocamion3.update(camionachanger);
-		System.out.println ("\nFin\n");
+		System.out.println ("\nFin\n");*/
 		
 		//////////////////////////////////////////////////////////////////////
 		// Recuperer tous les camions
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nRécuperer tous les camions\n");
+		/*System.out.println ("\nRécuperer tous les camions\n");
 		DAOCamion daocamion2 = DAOFactory.creerDAOCamion();
 		List<Camion> lcam2 = daocamion2.select();
 		for ( int jrr2 = 0 ; jrr2 < lcam2.size(); jrr2++ ) {
 			Camion camion = lcam2.get(jrr2);
 			System.out.println ("id : " + camion.get_id() + " | Poids max : " + camion.get_poidsmax() + " | Disponible : " + camion.get_disponible());
 		}
-		System.out.println ("\nFin\n");
+		System.out.println ("\nFin\n");*/
 		
 		//////////////////////////////////////////////////////////////////////
 		// Récuperer tous les types de dechets
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println ("\nRécuperer tous les types de dechets\n");
+		/*System.out.println ("\nRécuperer tous les types de dechets\n");
 		DAOTypedechets daotypedechets = DAOFactory.creerDAOTypedechets();
 		List<Typedechets> ltd = daotypedechets.select();
 		for ( int jrr3 = 0 ; jrr3 < ltd.size(); jrr3++ ) {
 			Typedechets typedechets = ltd.get(jrr3);
 			System.out.println ("id : " + typedechets.get_id() + " | Libelle : " + typedechets.get_libelle());
 		}
-		System.out.println ("\nFin\n");
-		
-		//////////////////////////////////////////////////////////////////////
-		// Récuperer tous les types de benne
-		//////////////////////////////////////////////////////////////////////
-		
-		System.out.println ("\nRécuperer tous les types de benne\n");
-		DAOTypebenne daotypebenne = DAOFactory.creerDAOTypebenne();
-		List<Typebenne> ltb = daotypebenne.select();
-		for ( int jrr4 = 0 ; jrr4 < ltb.size(); jrr4++ ) {
-			Typebenne typebenne = ltb.get(jrr4);
-			System.out.println ("id : " + typebenne.get_id() + " | Volume : " + typebenne.get_volume() + " | Typedechets_id : " + typebenne.get_typedechets_id());
-		}
-		System.out.println ("\nFin\n");		
-		//////////////////////////////////////////////////////////////////////
-		// Récuperer tous les contenir
-		//////////////////////////////////////////////////////////////////////
-		
-		System.out.println ("\nRécuperer tous les types de benne\n");
-		DAOContenir daocontenir = DAOFactory.creerDAOContenir();
-		List<Contenir> ltc = daocontenir.select();
-		for ( int jrr4 = 0 ; jrr4 < ltc.size(); jrr4++ ) {
-			Contenir contenir = ltc.get(jrr4);
-			System.out.println ("Camion_id : " + contenir.get_Camion_id() + " | Typebenne_id : " + contenir.get_Typebenne_id());
-		}
-		System.out.println ("\nFin\n");
+		System.out.println ("\nFin\n");*/
 	}
 }

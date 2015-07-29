@@ -31,6 +31,8 @@ public class DAOMysqlIlot implements DAOIlot {
             h.set_longitude(r.getDouble("longitude"));
             h.set_latitude(r.getDouble("latitude"));
             h.set_Contact_id(r.getInt("contact_id"));
+            DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
+            h.set_conteneurs(daoconteneur.selectbyilotid(r.getInt("id")));
             //ajouter à la liste
             liste.add(h);
         }
@@ -41,7 +43,37 @@ public class DAOMysqlIlot implements DAOIlot {
 
         return liste;
 	}
+	
+	@Override
+	public Ilot selectbyid(int id) throws Exception {
+	    String sql = "SELECT * FROM Ilot WHERE id = "+id+";";
+        List<Ilot> liste = new LinkedList<Ilot>();
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        
+        ResultSet r = s.executeQuery(sql);
+        
+        r.next();
+    	Ilot h = new Ilot();
+        //récupérer les champs
+        h.set_id(r.getInt("id"));
+        h.set_adresse(r.getString("adresse"));
+        h.set_codepostal(r.getInt("codepostal"));
+        h.set_ville(r.getString("ville"));
+        h.set_longitude(r.getDouble("longitude"));
+        h.set_latitude(r.getDouble("latitude"));
+        h.set_Contact_id(r.getInt("contact_id"));
+        DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
+        h.set_conteneurs(daoconteneur.selectbyilotid(r.getInt("id")));
+        
+        r.close();
+        s.close();
+        cnx.close();
 
+        return h;
+	}
 	@Override
 	public List<Ilot> selectByContact(int i) throws Exception {
 	    String sql = "SELECT * FROM Ilot WHERE Contact_id = ";

@@ -24,13 +24,6 @@ public class DAOFactory {
         }
         return dao;
     }
-    public static DAOConteneuravider creerDAOConteneuravider(){
-        DAOConteneuravider dao = null;
-        if(typeBD.equalsIgnoreCase("Mysql")){
-            dao = new DAOMysqlConteneuravider();
-        }
-        return dao;
-    }
 	public static DAOIlotdepassage creerDAOIlotdepassage() {
         DAOIlotdepassage dao = null;
         if(typeBD.equalsIgnoreCase("Mysql")){
@@ -63,20 +56,6 @@ public class DAOFactory {
 		DAOTypedechets dao = null;
         if(typeBD.equalsIgnoreCase("Mysql")){
             dao = new DAOMysqlTypedechets();
-        }
-        return dao;
-	}
-	public static DAOTypebenne creerDAOTypebenne() {
-		DAOTypebenne dao = null;
-        if(typeBD.equalsIgnoreCase("Mysql")){
-            dao = new DAOMysqlTypebenne();
-        }
-        return dao;
-	}
-	public static DAOContenir creerDAOContenir() {
-		DAOContenir dao = null;
-        if(typeBD.equalsIgnoreCase("Mysql")){
-            dao = new DAOMysqlContenir();
         }
         return dao;
 	}

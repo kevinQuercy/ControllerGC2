@@ -13,9 +13,10 @@ import data.Ilotdepassage;
 public class DAOMysqlItineraire implements DAOItineraire {
 
 	@Override
-	public List<Itineraire> selectbyplanificationid(int plid) throws Exception {
+	public List<Itineraire> selectbydate(Date d) throws Exception {
 		// recuperation des itineraires
-	    String sql = "SELECT * FROM Itineraire WHERE Planification_id = '" + plid + "';";
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	    String sql = "SELECT * FROM Itineraire WHERE Planification_date = '" + sdf.format(d) + "';";
         List<Itineraire> liste = new LinkedList<Itineraire>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
@@ -29,8 +30,7 @@ public class DAOMysqlItineraire implements DAOItineraire {
         	Itineraire h = new Itineraire();
             h.set_id(r.getInt("id"));
             h.set_Camion_id(r.getInt("Camion_id"));
-            h.set_Planification_id(r.getInt("Planification_id"));
-            h.set_date(r.getDate("date"));
+            h.set_Planification_date(r.getDate("Planification_date"));
 			h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
             liste.add(h);
         }
@@ -46,7 +46,7 @@ public class DAOMysqlItineraire implements DAOItineraire {
 	public Itineraire selectbydateetcamion(Date d,int camionid) throws Exception {
 		// recuperation des itineraires
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-	    String sql = "SELECT * FROM Itineraire WHERE date = '" + sdf.format(d) + "' AND Camion_id = '"+ camionid +"';";
+	    String sql = "SELECT * FROM Itineraire WHERE Planification_date = '" + sdf.format(d) + "' AND Camion_id = '"+ camionid +"';";
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
         //faire la requête
@@ -58,9 +58,10 @@ public class DAOMysqlItineraire implements DAOItineraire {
         r.next();
     	Itineraire h = new Itineraire();
         h.set_id(r.getInt("id"));
+        h.set_Planification_date(r.getDate("Planification_date"));
         h.set_Camion_id(r.getInt("Camion_id"));
-        h.set_Planification_id(r.getInt("Planification_id"));
-        h.set_date(r.getDate("date"));
+        h.set_longueur(r.getInt("longueur"));
+        h.set_Typedechets_id(r.getInt("Typedechets_id"));
 		h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
         r.close();
         s.close();
@@ -73,15 +74,16 @@ public class DAOMysqlItineraire implements DAOItineraire {
 
 	@Override
 	public int insert(Itineraire it) throws Exception {
-	    String sql = "INSERT INTO Itineraire " + " (Camion_id,Planification_id,date) " + " VALUES( ";
+	    String sql = "INSERT INTO Itineraire " + " (Planification_date,Camion_id,longueur,Typedechets_id) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        sql += "'" + sdf.format(it.get_Planification_date()) + "',";
         sql += "'" + it.get_Camion_id() + "',";
-        sql += "'" + it.get_Planification_id() + "',";
-		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-        sql += "'" + sdf.format(it.get_date()) + "')";
+        sql += "'" + it.get_longueur() + "',";
+        sql += "'" + it.get_Typedechets_id() + "')";
         int n = s.executeUpdate(sql,Statement.RETURN_GENERATED_KEYS);
         ResultSet id = s.getGeneratedKeys();
         int lastid = 1;

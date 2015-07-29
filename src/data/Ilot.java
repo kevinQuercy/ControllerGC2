@@ -1,5 +1,8 @@
 package data;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Ilot {
 	private int id;
 	private String adresse;
@@ -8,7 +11,11 @@ public class Ilot {
 	private Double longitude;
 	private Double latitude;
 	private int Contact_id;
-
+	private List<Conteneur> conteneurs;
+	
+	public Ilot(){
+		conteneurs= new LinkedList<Conteneur>();
+	}
 	public int get_id() {
 		return this.id;
 	}
@@ -30,6 +37,9 @@ public class Ilot {
 	public int get_Contact_id() {
 		return this.Contact_id;
 	}
+	public List<Conteneur> get_conteneurs() {
+		return this.conteneurs;
+	}
 	public void set_id(int a) {
 		this.id=a;
 	}
@@ -50,5 +60,11 @@ public class Ilot {
 	}
 	public void set_Contact_id(int a) {
 		this.Contact_id=a;
+	}
+	public void set_conteneurs(List<Conteneur> lc) {
+		this.conteneurs=lc;
+	}
+	public void addconteneur(Conteneur c) {
+		this.conteneurs.add(c);
 	}
 }
