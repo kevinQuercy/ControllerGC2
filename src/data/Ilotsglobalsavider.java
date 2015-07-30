@@ -1,12 +1,10 @@
 package data;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import DAOS.DAOCamion;
-import DAOS.DAOConteneur;
 import DAOS.DAOFactory;
 import DAOS.DAOHistorique;
 import DAOS.DAOIlot;
@@ -29,6 +27,8 @@ public class Ilotsglobalsavider {
 		System.out.println ("Nombre de camions disponibles : " + camionsdisponibles.size());
 		// Pour tous les types de dechets
 		for ( int i = 0 ; i < touslesdechets.size(); i++ ) {
+			int poidstotal = 0;
+			int volumetotal = 0;
 			Ilotsavider il = new Ilotsavider(touslesdechets.get(i).get_id());
 			// pour tous les camions disponibles
 			for ( int j = 0 ; j < camionsdisponibles.size(); j++ ) {
@@ -68,9 +68,13 @@ public class Ilotsglobalsavider {
 					if(volumeencours  * 100 / volumemax >= taux || passageoblige) {
 						// ajouter l'ilot a la liste des ilot
 						il.ajouterilot(touslesilots.get(k));
+						volumetotal += volumeencours;
+						poidstotal += poids;
 					}
 				}
 			}
+			il.set_volumetotal(volumetotal);
+			il.set_poidstotal(poidstotal);
 			this.ajouterilotsavider(il);
 		}
 	}

@@ -1,5 +1,6 @@
 package core;
 
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -17,52 +18,48 @@ import data.Ilotsglobalsavider;
 import data.Itineraire;
 import data.Planification;
 
-public class DAOToolbox {
+public class GC2Toolbox {
 	public static void main(String[] args) {
 		while(true) {
 			try {
-				DAOToolbox.menu();
+				GC2Toolbox.menu();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println ("\nERREUR !!\n");
-				
+				e.printStackTrace();
 			}
 		}
 	}
 	public static void menu() throws Exception {
-		Scanner sc = new Scanner(System.in);
-		System.out.println ("\n\n#######################################################");
-		System.out.println ("##  Choix de manipulation DAO                        ##");
-		System.out.println ("#######################################################\n");
-		System.out.println ("1 - Créer une planification du jour et l'enregistrer");
+		affichertitre("Garbage Collector 2.0 Toolbox");
+		System.out.println ("1 - Créer et enregistrer la planification du jour");
 		System.out.println ("2 - Supprimer la planification du jour");
-		System.out.println ("3 - Afficher la planification du jour");
-		System.out.println ("4 - Créer et afficher ilotsglobalsavider");
-		System.out.println ("5 - Mise à jour d'un conteneur");
-		System.out.println ("6 - Remplir les conteneurs aleatoirement");
+		System.out.println ("3 - Créer et afficher ilotsglobalsavider");
+		System.out.println ("4 - Mise à jour d'un conteneur");
+		System.out.println ("5 - Remplir les conteneurs aleatoirement");
+		System.out.println ("6 - Remplir tous les conteneurs à 90%");
 		System.out.println ("7 - Vider tous les conteneurs");
 		System.out.println ("0 - Quitter");
 		System.out.print ("\nEntrez votre choix : ");
+		Scanner sc = new Scanner(System.in);
 		String str = sc.nextLine();
 		switch (str) {
-			case "1" : DAOToolbox.creeretenregistreruneplanification();break;
-			case "2" : DAOToolbox.supprimerplanificationdujour(); break;
-			case "3" : DAOToolbox.afficherlaplanificationdujour(); break;
-			case "4" : DAOToolbox.creerilotsglobalsavider();break;
-			case "5" : DAOToolbox.miseajourdunconteneur();break;
-			case "6" : DAOToolbox.rempliraleatoirement();break;
-			case "7" : DAOToolbox.vidertouslesconteneurs();break;
+			case "1" : GC2Toolbox.creeretenregistreruneplanification();break;
+			case "2" : GC2Toolbox.supprimerplanificationdujour(); break;
+			case "3" : GC2Toolbox.creerilotsglobalsavider();break;
+			case "4" : GC2Toolbox.miseajourdunconteneur();break;
+			case "5" : GC2Toolbox.rempliraleatoirement();break;
+			case "6" : GC2Toolbox.remplira90();break;
+			case "7" : GC2Toolbox.vidertouslesconteneurs();break;
 			case "0" : System.out.println ("L'application s'arrete");System.exit(0);
 		}
-		DAOToolbox.menu();
+		GC2Toolbox.menu();
 	}
 	//////////////////////////////////////////////////////////////////////
 	// Vider tous les conteneurs
 	//////////////////////////////////////////////////////////////////////
 	public static void vidertouslesconteneurs() throws Exception {
-		System.out.println ("\n\n#######################################################");
-		System.out.println ("##  Vider tous les conteneurs                        ##");
-		System.out.println ("#######################################################\n");
+		affichertitre("Vider tous les conteneurs");
 		DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
 		List<Conteneur> conteneurs = daoconteneur.select();
 		for( int i = 0 ; i < conteneurs.size(); i++ ) {
@@ -77,9 +74,7 @@ public class DAOToolbox {
 	// Remplir les conteneurs aleatoirement
 	//////////////////////////////////////////////////////////////////////
 	public static void rempliraleatoirement() throws Exception {
-		System.out.println ("\n\n#######################################################");
-		System.out.println ("##  Remplir les conteneurs aleatoirement             ##");
-		System.out.println ("#######################################################\n");
+		affichertitre("Remplir les conteneurs aleatoirement");
 		DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
 		List<Conteneur> conteneurs = daoconteneur.select();
 		for( int i = 0 ; i < conteneurs.size(); i++ ) {
@@ -87,13 +82,48 @@ public class DAOToolbox {
 			int max = c.get_volumemax();
 			int current = c.get_lastvolume();
 			int poids = c.get_lastpoids();
-			int min = (max/2);
+			int min = max/2;
+			if(c.get_TypeDechets_id()==2) {
+				min = (int)max/3;
+			}
+			if(c.get_TypeDechets_id()==3) {
+				min = 0;
+			}
 			int volume = (int)(Math.random() * (max-min)+min);
 			int maxpoids = 350;
 			int minpoids = 30;
 			int newpoids = (int)(Math.random() * (maxpoids-minpoids)+minpoids);
 			c.majetat(volume,newpoids);
-			System.out.println ("Conteneur : " + c.get_id() + " | Volume max : " + max + " | Ancien volume : " + current + " | Nouveau volume : " + volume +" | Nouveau poids : " + newpoids);
+			System.out.println ("Conteneur: " + c.get_id() + " | Volmax: " + max + " | Oldvol: " + current + " | Newvol: " + volume +" | OldPoids: " + poids +" | Newpoids: " + newpoids);
+			daoconteneur.majetat(c);
+		}
+		System.out.println ("\nFin");
+	}
+	//////////////////////////////////////////////////////////////////////
+	// Remplir tous les conteneurs à 90%
+	//////////////////////////////////////////////////////////////////////
+	public static void remplira90() throws Exception {
+		affichertitre("Remplir tous les conteneurs à 90%");
+		DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
+		List<Conteneur> conteneurs = daoconteneur.select();
+		for( int i = 0 ; i < conteneurs.size(); i++ ) {
+			Conteneur c = conteneurs.get(i);
+			int max = c.get_volumemax();
+			int current = c.get_lastvolume();
+			int poids = c.get_lastpoids();
+			int min = max/2;
+			if(c.get_TypeDechets_id()==2) {
+				min = (int)max/3;
+			}
+			if(c.get_TypeDechets_id()==3) {
+				min = 0;
+			}
+			int volume = (int) (max*0.90);
+			int maxpoids = 350;
+			int minpoids = 30;
+			int newpoids = (int)(Math.random() * (maxpoids-minpoids)+minpoids);
+			c.majetat(volume,newpoids);
+			System.out.println ("Conteneur: " + c.get_id() + " | Volmax: " + max + " | Oldvol: " + current + " | Newvol: " + volume +" | OldPoids: " + poids +" | Newpoids: " + newpoids);
 			daoconteneur.majetat(c);
 		}
 		System.out.println ("\nFin");
@@ -102,9 +132,7 @@ public class DAOToolbox {
 	// Mise à jour l'etat d'un conteneur
 	//////////////////////////////////////////////////////////////////////
 	public static void miseajourdunconteneur() throws Exception {
-		System.out.println ("\n\n#######################################################");
-		System.out.println ("##  Mise à jour d'un conteneur                       ##");
-		System.out.println ("#######################################################\n");
+		affichertitre("Mise à jour d'un conteneur");
 		Scanner sc = new Scanner(System.in);
 		System.out.print ("\nEntrez l'id du conteneur : ");
 		String str = sc.nextLine();
@@ -143,9 +171,7 @@ public class DAOToolbox {
 	// Suppression de la planification du jour
 	//////////////////////////////////////////////////////////////////////
 	public static void supprimerplanificationdujour() throws Exception {
-		System.out.println ("\n\n#######################################################");
-		System.out.println ("##  Suppression de la planification du jour          ##");
-		System.out.println ("#######################################################\n");
+		affichertitre("Suppression de la planification du jour");
 		DAOPlanification daoplanification = DAOFactory.creerDAOPlanification();
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		System.out.println ("Suppression de la planification du : " + sdf.format(new Date()));
@@ -153,9 +179,9 @@ public class DAOToolbox {
 	}
 	public static void creeretenregistreruneplanification() throws Exception {
 		//////////////////////////////////////////////////////////////////////
-		// Creation d'une planification
+		// Créer et enregistrer la planification du jour
 		//////////////////////////////////////////////////////////////////////
-		
+		affichertitre("Créer et enregistrer la planification du jour");
 		System.out.println ("\nCreation d'une planification\n");
 		DAOIlot daoilot = DAOFactory.creerDAOIlot();
 		System.out.println ("Creation de 3 itineraires");
@@ -169,6 +195,10 @@ public class DAOToolbox {
 		it1.ajouterilot(daoilot.selectbyid(3),3);
 		System.out.println ("    Ajout de la longueur à 10 000 m");
 		it1.set_longueur(10000);
+		System.out.println ("    Ajout du volume total");
+		it1.set_volumetotal(3600);
+		System.out.println ("    Ajout du poids total");
+		it1.set_poidstotal(1500);
 		System.out.println ("  Creation de l'itineraire 2 pour le camion 4");
 		Itineraire it2 = new Itineraire(2,4);
 		System.out.println ("    Ajout de l'ilot 4 avec l'ordre 1");
@@ -179,6 +209,10 @@ public class DAOToolbox {
 		it2.ajouterilot(daoilot.selectbyid(6),3);
 		System.out.println ("    Ajout de la longueur à 14 000 m");
 		it2.set_longueur(14000);
+		System.out.println ("    Ajout du volume total");
+		it2.set_volumetotal(3600);
+		System.out.println ("    Ajout du poids total");
+		it2.set_poidstotal(1500);
 		System.out.println ("  Creation de l'itineraire 3 pour le camion 6");
 		Itineraire it3 = new Itineraire(3,6);
 		System.out.println ("    Ajout de l'ilot 7 avec l'ordre 1");
@@ -189,6 +223,10 @@ public class DAOToolbox {
 		it3.ajouterilot(daoilot.selectbyid(9),3);
 		System.out.println ("    Ajout de la longueur à 12 000 m");
 		it3.set_longueur(12000);
+		System.out.println ("    Ajout du volume total");
+		it3.set_volumetotal(3600);
+		System.out.println ("    Ajout du poids total");
+		it3.set_poidstotal(1500);
 		System.out.println ("\nCreation de 1 Planification");
 		Planification planif = new Planification();
 		planif.set_date(new Date());
@@ -201,23 +239,17 @@ public class DAOToolbox {
 		System.out.println ("  Set du taux");
 		planif.set_taux(50);
 		System.out.println ("\nFin de la planification");
-
 		//////////////////////////////////////////////////////////////////////
 		// Sauvegarde d'une planification
 		//////////////////////////////////////////////////////////////////////		
-
 		System.out.println ("\nSauvegarde de la planification\n");
 		DAOPlanification daoplanification = DAOFactory.creerDAOPlanification();
 		daoplanification.insert(planif);
 		System.out.println ("\nFin de la sauvegarde");
-	}
-	
-
-	//////////////////////////////////////////////////////////////////////
-	// Affichage d'une planification
-	//////////////////////////////////////////////////////////////////////
-	public static void afficherlaplanificationdujour() throws Exception {
-		System.out.println ("\nAffichage d'une Planification\n");
+		//////////////////////////////////////////////////////////////////////
+		// Affichage de la planification du jour
+		//////////////////////////////////////////////////////////////////////	
+		System.out.println ("\nAffichage de la planification du jour\n");
 		DAOPlanification daoplanification2 = DAOFactory.creerDAOPlanification();
 		Planification pla = daoplanification2.selectbydate(new Date());
 		System.out.println ("id : " + pla.get_id());
@@ -231,25 +263,27 @@ public class DAOToolbox {
 			System.out.println ("  Camion_id: " + it.get_Camion_id());
 			System.out.println ("  Planification_date : " + it.get_Planification_date());
 			System.out.println ("  Longueur : " + it.get_longueur());
+			System.out.println ("  Volume total : " + it.get_volumetotal());
+			System.out.println ("  Poids total : " + it.get_poidstotal());
 			List<Ilotdepassage> ilots = it.get_ilotsdepassage();
 			System.out.println ("\n  Nombre d'ilots : " + ilots.size());
 			for ( int jj = 0 ; jj < ilots.size(); jj++ ) {
 				Ilotdepassage il = ilots.get(jj);
-				System.out.println ("    Ilots : " + il.get_Ilot().get_id() + " | Ordre : " + il.get_ordre() + " | Itineraire : " + il.get_Itineraire_id());
+				System.out.println ("    Ilots: " + il.get_Ilot().get_id() + " | Ordre: " + il.get_ordre() + " | Itineraire: " + il.get_Itineraire_id());
 			}
 		}
 		System.out.println ("\nFin de l'affichage");
 	}
 	//////////////////////////////////////////////////////////////////////
-	// Creer Ilots global a vider
+	// Créer Ilots global à vider
 	//////////////////////////////////////////////////////////////////////
 	public static void creerilotsglobalsavider() throws Exception {
-		System.out.println ("\n\n#######################################################");
-		System.out.println ("##  Créer ilots globals a vider                      ##");
-		System.out.println ("#######################################################\n");
+		affichertitre("Créer ilots globals à vider");
 		Scanner sc = new Scanner(System.in);
-		System.out.print("Entrez le taux souhaité (2 chiffres) : ");
+		System.out.print("Entrez le taux souhaité (2 chiffres) (defaut:75): ");
 		String str = sc.nextLine();
+		System.out.print(str);
+		if(str.isEmpty()) { str="75";}
 		int taux = Integer.parseInt(str);
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, -3);
@@ -261,6 +295,8 @@ public class DAOToolbox {
 			Ilotsavider il = ilotsavider.get(i);
 			System.out.println ("Type de dechets : " + il.get_typedechets());
 			System.out.println ("Nombre de camions disponibles : " + il.get_camions().size());
+			System.out.println ("Volume total à vider : " + il.get_volumetotal()+" Litres");
+			System.out.println ("Poids total à vider : " + il.get_poidstotal()+" Kg");
 			System.out.println ("Nombre d'ilots à vider : " + il.get_ilots().size());
 			System.out.print ("Ilots : ");
 			for (int j = 0 ; j < il.get_ilots().size() ; j++ ) {
@@ -269,5 +305,10 @@ public class DAOToolbox {
 			System.out.print ("\n\n");
 			System.out.println ("\nFin de l'affichage");
 		}
+	}
+	private static void affichertitre(String t) {
+		System.out.println ("\n\n#######################################################");
+		System.out.println ("##  "+t);
+		System.out.println ("#######################################################\n");
 	}
 }

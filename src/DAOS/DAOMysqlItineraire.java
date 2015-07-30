@@ -30,6 +30,9 @@ public class DAOMysqlItineraire implements DAOItineraire {
         	Itineraire h = new Itineraire();
             h.set_id(r.getInt("id"));
             h.set_Camion_id(r.getInt("Camion_id"));
+            h.set_longueur(r.getInt("longueur"));
+            h.set_volumetotal(r.getInt("volumetotal"));
+            h.set_poidstotal(r.getInt("poidstotal"));
             h.set_Planification_date(r.getDate("Planification_date"));
 			h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
             liste.add(h);
@@ -61,6 +64,8 @@ public class DAOMysqlItineraire implements DAOItineraire {
         h.set_Planification_date(r.getDate("Planification_date"));
         h.set_Camion_id(r.getInt("Camion_id"));
         h.set_longueur(r.getInt("longueur"));
+        h.set_volumetotal(r.getInt("volumetotal"));
+        h.set_poidstotal(r.getInt("poidstotal"));
         h.set_Typedechets_id(r.getInt("Typedechets_id"));
 		h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
         r.close();
@@ -74,7 +79,7 @@ public class DAOMysqlItineraire implements DAOItineraire {
 
 	@Override
 	public int insert(Itineraire it) throws Exception {
-	    String sql = "INSERT INTO Itineraire " + " (Planification_date,Camion_id,longueur,Typedechets_id) " + " VALUES( ";
+	    String sql = "INSERT INTO Itineraire (Planification_date,Camion_id,longueur,volumetotal,poidstotal,Typedechets_id) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
@@ -83,6 +88,8 @@ public class DAOMysqlItineraire implements DAOItineraire {
         sql += "'" + sdf.format(it.get_Planification_date()) + "',";
         sql += "'" + it.get_Camion_id() + "',";
         sql += "'" + it.get_longueur() + "',";
+        sql += "'" + it.get_volumetotal() + "',";
+        sql += "'" + it.get_poidstotal() + "',";
         sql += "'" + it.get_Typedechets_id() + "')";
         int n = s.executeUpdate(sql,Statement.RETURN_GENERATED_KEYS);
         ResultSet id = s.getGeneratedKeys();

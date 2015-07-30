@@ -10,6 +10,8 @@ public class Itineraire {
 	private Date Planification_date;
 	private int Camion_id;
 	private int longueur;
+	private int volumetotal;
+	private int poidstotal;
 	private int Typedechets_id;
 	private List<Ilotdepassage> ilotsdepassage;
 
@@ -33,6 +35,12 @@ public class Itineraire {
 	public int get_longueur() {
 		return this.longueur;
 	}
+	public int get_volumetotal() {
+		return this.volumetotal;
+	}
+	public int get_poidstotal() {
+		return this.poidstotal;
+	}
 	public int get_Typedechets_id() {
 		return this.Typedechets_id;
 	}
@@ -50,6 +58,12 @@ public class Itineraire {
 	}
 	public void set_longueur(int a) {
 		this.longueur=a;
+	}
+	public void set_volumetotal(int a) {
+		this.volumetotal=a;
+	}
+	public void set_poidstotal(int a) {
+		this.poidstotal=a;
 	}
 	public void set_Typedechets_id(int a) {
 		this.Typedechets_id=a;
