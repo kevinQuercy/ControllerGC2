@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.xml.ws.Endpoint;
+
 import DAOS.DAOConteneur;
 import DAOS.DAOFactory;
 import DAOS.DAOIlot;
@@ -17,9 +19,11 @@ import data.Ilotsavider;
 import data.Ilotsglobalsavider;
 import data.Itineraire;
 import data.Planification;
+import webservice.WSPlanificationImp;
 
 public class GC2Toolbox {
 	public static void main(String[] args) {
+		Endpoint.publish("http://localhost:8081/WS/WSPlanification", new WSPlanificationImp());
 		while(true) {
 			try {
 				GC2Toolbox.menu();
