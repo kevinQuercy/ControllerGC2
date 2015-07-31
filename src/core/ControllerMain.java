@@ -19,7 +19,7 @@ public class ControllerMain {
 
 	public static void main(String[] args) {
 		LOGGER.info("Starting");
-		int nbContainers = 50; // default
+		int nbContainers = 150; // default
 		int server_port = 10000; // default
 		
 		if (args.length >= 1)

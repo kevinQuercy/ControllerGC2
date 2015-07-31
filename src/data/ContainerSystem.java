@@ -1,8 +1,5 @@
 package data;
 
-import graph.Graph;
-import graph.GraphNode;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +27,7 @@ public class ContainerSystem {
 	private int nbVehicles;
 	private List<List<ContainerSet>> collectRoutes;
 	private List<ContainerSet> notCollected;
+	private List<Truck> trucks;
 	
 	private ContainerSystem() {
 		super();
@@ -39,6 +37,7 @@ public class ContainerSystem {
 		nbVehicles = 0;
 		collectRoutes = null;
 		notCollected = null;
+		trucks = null;
 	}
 	
 	public List<ContainerSet> getContainerSets() {
@@ -69,6 +68,10 @@ public class ContainerSystem {
 		return notCollected;
 	}
 
+	public List<Truck> getTrucks() {
+		return trucks;
+	}
+
 	/** add containerSet to the system
 	 * @note containerSet shall already contains its containers
 	 */ 
@@ -97,55 +100,35 @@ public class ContainerSystem {
 				notCollected.add(containerSet);
 		}
 		
-		// determine circuits
-		Graph graph = buildGraph(containersToCollect);
-		List<List<GraphNode>> routes = graph.solveVehicleRouting(nbVehicles);
+		// prepare trucks
+		trucks = new ArrayList<>();
+		for (int i = 0; i < nbVehicles; i++) {
+			Truck truck = new Truck();
+			truck.setDepot(depot);
+			trucks.add(truck);
+		}
+		
+		// construct problem
+		CircuitSolution problem = new CircuitSolution();
+		problem.setContainerSetList(containersToCollect);
+		problem.setVehicleList(trucks);
+		
+		// solve problem
+		CircuitSolver solver = new CircuitSolver();
+		CircuitSolution solution = solver.solve(problem);
 		
 		// store result in collectRoutes
 		collectRoutes = new ArrayList<>();
-		for (List<GraphNode> route: routes) {
+		for (Truck truck: solution.getTruckList()) {
 			List<ContainerSet> collectRoute = new ArrayList<>();
 			collectRoutes.add(collectRoute);
 			
-			for (GraphNode node: route) {
-				ContainerSetGraphNode csNode = (ContainerSetGraphNode) node;
-				if (csNode.containerSet != null)
-					collectRoute.add(csNode.containerSet);
+			ContainerSet containerSet = truck.getNextContainerSet();
+			while(containerSet != null)
+			{
+				collectRoute.add(containerSet);
+				containerSet = containerSet.getNextContainerSet();
 			}
 		}
-	}
-	
-	private static class ContainerSetGraphNode extends GraphNode {
-		public ContainerSet containerSet;
-		public GeoCoordinate location;
-		
-		@Override
-		public double getWeight(GraphNode destNode) {
-			return location.distanceTo(((ContainerSetGraphNode)destNode).location);
-		}
-	}
-	
-	// generate graph for this list of ContainerSet, adding depot
-	private Graph buildGraph(List<ContainerSet> containerSets) {
-		Graph graph = new Graph();
-		
-		// create nodes for depot and all container sets
-		ContainerSetGraphNode depotNode = new ContainerSetGraphNode();
-		depotNode.containerSet = null;
-		depotNode.location = depot;
-		graph.nodes.add(depotNode);
-		graph.startNode = depotNode;
-		
-		for (ContainerSet cs: containerSets) {
-			ContainerSetGraphNode csNode = new ContainerSetGraphNode();
-			csNode.containerSet = cs;
-			csNode.location = cs.getLocation();
-			graph.nodes.add(csNode);
-		}
-		
-		// build edges
-		graph.buildEdges();
-		
-		return graph;
 	}
 }
