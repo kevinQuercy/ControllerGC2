@@ -33,6 +33,7 @@ public class DAOMysqlItineraire implements DAOItineraire {
             h.set_longueur(r.getInt("longueur"));
             h.set_volumetotal(r.getInt("volumetotal"));
             h.set_poidstotal(r.getInt("poidstotal"));
+            h.set_Typedechets_id(r.getInt("Typedechets_id"));
             h.set_Planification_date(r.getDate("Planification_date"));
 			h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
             liste.add(h);
