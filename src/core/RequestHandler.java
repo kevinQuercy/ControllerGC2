@@ -23,6 +23,7 @@ import data.Itineraire;
 import data.Planification;
 import data.SolveCamion;
 import data.SolveIlot;
+import data.Typedechets;
 
 /** @file
  * 
@@ -141,12 +142,20 @@ public class RequestHandler {
 		eltSupervisionState.addContent(eltContainerSets);
 		
 		try {
+			List<Typedechets> type_dechets = DAOFactory.creerDAOTypedechets().select();
 			for (Ilot ilot: DAOFactory.creerDAOIlot().select()) {
 				Element eltContainerSet = new Element("container_set");
 				eltContainerSets.addContent(eltContainerSet);
 				
 				addLocation(eltContainerSet, "location", ilot.getLocation());
-				addFieldBool(eltContainerSet, "to_be_collected", ilot.isReadyForCollect());
+				boolean ilot_a_collecter = false;
+				for (Typedechets type_dechet: type_dechets) {
+					if (ilot.isReadyForCollect(type_dechet)) {
+						ilot_a_collecter = true;
+						break;
+					}
+				}
+				addFieldBool(eltContainerSet, "to_be_collected", ilot_a_collecter);
 				
 				Element eltContainers = new Element("containers");
 				eltContainerSet.addContent(eltContainers);
@@ -174,62 +183,69 @@ public class RequestHandler {
 	
 	private void handleTrigCircuitComputation(Element rootReq, Element rootResp) {
 		try {
-			// ilots a collecter
-			List<SolveIlot> ilots_a_collecter = new ArrayList<>();
-			for (Ilot ilot: DAOFactory.creerDAOIlot().select()) {
-				if (ilot.isReadyForCollect())
-					ilots_a_collecter.add(new SolveIlot(ilot));
-			}
-			
-			// camions
-			List<SolveCamion> camions = new ArrayList<>();
-			for (Camion camion: DAOFactory.creerDAOCamion().select()) {
-				camions.add(new SolveCamion(camion, depot));
-			}
-
-			// construction du probleme
-			CircuitSolution problem = new CircuitSolution();
-			problem.setSolveIlotList(ilots_a_collecter);
-			problem.setSolveCamionList(camions);
-			
-			// resolution du probleme
-			CircuitSolver solver = new CircuitSolver();
-			CircuitSolution solution = solver.solve(problem);
-			
-			// sauvegarde de la solution dans la base
 			Planification planif = new Planification();
 			planif.set_date(new Date());
 			planif.set_taux(50); // ???
-			for (SolveCamion solveCamion: solution.getSolveCamionList()) {
-				Itineraire iti = new Itineraire(1/*typedechet*/, solveCamion.getCamion().get_id());
-				
-				int ilotIdx = 0;
-				double longueur = 0;
-				int poidsTotal = 0;
-				int volumteTotal = 0;
-				SolveIlot solveIlot = solveCamion.getNextSolveIlot();
-				GeoCoordinate prev_loc = solveCamion.getDepot(); // on demarre du depot
-				while (solveIlot != null) {
-					iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
-					
-					for (Conteneur conteneur: solveIlot.getIlot().get_conteneurs()) {
-						poidsTotal += conteneur.get_lastpoids();
-						volumteTotal += conteneur.get_lastvolume();
-					}
-					
-					longueur += prev_loc.distanceTo(solveIlot.getLocation());
-					prev_loc = solveIlot.getLocation();
-					
-					solveIlot = solveIlot.getNextSolveIlot();
+
+			// on traite un type de dechet a la fois
+			for (Typedechets type_dechet: DAOFactory.creerDAOTypedechets().select()) {
+
+				// ilots a collecter
+				List<SolveIlot> ilots_a_collecter = new ArrayList<>();
+				for (Ilot ilot: DAOFactory.creerDAOIlot().select()) {
+					if (ilot.isReadyForCollect(type_dechet))
+						ilots_a_collecter.add(new SolveIlot(ilot));
 				}
-				longueur += prev_loc.distanceTo(solveCamion.getDepot()); // retour au depot
-				iti.set_longueur((int)longueur);
-				iti.set_poidstotal(poidsTotal);
-				iti.set_volumetotal(volumteTotal);
-
-				planif.ajouteritineraire(iti);
-			}
-
+				
+				if (ilots_a_collecter.size() > 0) {
+					// camions
+					List<SolveCamion> camions = new ArrayList<>();
+					for (Camion camion: DAOFactory.creerDAOCamion().select()) {
+						if (camion.get_Typedechets_id() == type_dechet.get_id())
+							camions.add(new SolveCamion(camion, depot));
+					}
+		
+					// construction du probleme
+					CircuitSolution problem = new CircuitSolution();
+					problem.setSolveIlotList(ilots_a_collecter);
+					problem.setSolveCamionList(camions);
+					
+					// resolution du probleme
+					CircuitSolver solver = new CircuitSolver();
+					CircuitSolution solution = solver.solve(problem);
+					
+					// sauvegarde de la solution dans la base
+					for (SolveCamion solveCamion: solution.getSolveCamionList()) {
+						Itineraire iti = new Itineraire(type_dechet.get_id(), solveCamion.getCamion().get_id());
+						
+						int ilotIdx = 0;
+						double longueur = 0;
+						int poidsTotal = 0;
+						int volumteTotal = 0;
+						SolveIlot solveIlot = solveCamion.getNextSolveIlot();
+						GeoCoordinate prev_loc = solveCamion.getDepot(); // on demarre du depot
+						while (solveIlot != null) {
+							iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
+							
+							for (Conteneur conteneur: solveIlot.getIlot().get_conteneurs()) {
+								poidsTotal += conteneur.get_lastpoids();
+								volumteTotal += conteneur.get_lastvolume();
+							}
+							
+							longueur += prev_loc.distanceTo(solveIlot.getLocation());
+							prev_loc = solveIlot.getLocation();
+							
+							solveIlot = solveIlot.getNextSolveIlot();
+						}
+						longueur += prev_loc.distanceTo(solveCamion.getDepot()); // retour au depot
+						iti.set_longueur((int)longueur);
+						iti.set_poidstotal(poidsTotal);
+						iti.set_volumetotal(volumteTotal);
+		
+						planif.ajouteritineraire(iti);
+					}
+				} // if ilots_a_collecter.size() > 0
+			} // for typedechet
 			
 			DAOPlanification daoPlanif = DAOFactory.creerDAOPlanification();
 			// on supprime une éventuelle planification existante à cette date
@@ -239,7 +255,6 @@ public class RequestHandler {
 				// rien à supprimer: OK
 			}
 			daoPlanif.insert(planif);
-			
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
 			buildResponseType(rootResp, "ERROR");
@@ -296,6 +311,7 @@ public class RequestHandler {
 		Element eltCircuit = new Element("circuit");
 		addFieldInt(eltCircuit, "index", circuitIndex);
 		addLocation(eltCircuit, "depot_location", depot);
+		addFieldInt(eltCircuit, "dechet_id", iti.get_Typedechets_id());
 		Element eltContainerSets = getIlotsdepassage(iti.get_ilotsdepassage()); 
 		eltCircuit.addContent(eltContainerSets);
 		return eltCircuit;

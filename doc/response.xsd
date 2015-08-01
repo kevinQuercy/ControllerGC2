@@ -81,6 +81,7 @@
     <xs:sequence>
 	  <xs:element name="index" type="xs:integer"/><!-- 0 to N-1 -->
 	  <xs:element name="depot_location" type="location"/>
+	  <xs:element name="dechet_id" type="xs:integer"/>
       <xs:element name="container_sets" type="container_sets_circuit"/>
     </xs:sequence>
   </xs:complexType>

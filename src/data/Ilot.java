@@ -72,13 +72,17 @@ public class Ilot {
 		return new GeoCoordinate(latitude, longitude);
 	}
 	
-	public boolean isReadyForCollect() {
+	public boolean isReadyForCollect(Typedechets type_dechet) {
 		// check how many containers are full
 		int containersFull = 0;
+		int containersTypeDechet = 0;
 		for (Conteneur conteneur: conteneurs) {
-			if (conteneur.isReadyForCollect())
-				containersFull++;
+			if (conteneur.get_TypeDechets_id() == type_dechet.get_id()) {
+				containersTypeDechet++;
+				if (conteneur.isReadyForCollect()) 
+					containersFull++;
+			}
 		}
-		return containersFull*100/conteneurs.size() >= 60; // if 60% or more containers are full, need to collect the set
+		return containersTypeDechet == 0 ? false : containersFull*100/containersTypeDechet >= 60; // if 60% or more containers are full, need to collect the set
 	}
 }
