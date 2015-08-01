@@ -89,6 +89,7 @@ public class ContainerSystem {
 	}
 	
 	public synchronized void trigCircuitComputation() {
+		/*
 		notCollected = new ArrayList<>();
 
 		// get container sets to collect
@@ -111,7 +112,7 @@ public class ContainerSystem {
 		// construct problem
 		CircuitSolution problem = new CircuitSolution();
 		problem.setContainerSetList(containersToCollect);
-		problem.setVehicleList(trucks);
+		problem.setTruckList(trucks);
 		
 		// solve problem
 		CircuitSolver solver = new CircuitSolver();
@@ -129,6 +130,6 @@ public class ContainerSystem {
 				collectRoute.add(containerSet);
 				containerSet = containerSet.getNextContainerSet();
 			}
-		}
+		}*/
 	}
 }

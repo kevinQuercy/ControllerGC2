@@ -2,15 +2,25 @@ package data;
 
 /** @file
  * 
- * Truck object, that will collect Containers from ContainerSets
+ * Encapsulation de Camion pour le calcul d'itineraire
  *
  */
 
-public class Truck {
+public class SolveCamion implements Standstill {
+	protected Camion camion; // camion encapsule
+	
 	private GeoCoordinate depot;
 
     // Shadow variables
-    protected ContainerSet nextContainerSet;
+    protected SolveIlot nextSolveIlot;
+    
+    public SolveCamion() {
+    }
+
+    public SolveCamion(Camion camion, GeoCoordinate depot) {
+    	this.camion = camion;
+    	this.depot = depot;
+    }
 
     public GeoCoordinate getDepot() {
 		return depot;
@@ -20,20 +30,28 @@ public class Truck {
 		this.depot = depot;
 	}
 
+	public Camion getCamion() {
+		return camion;
+	}
+	
+	@Override
 	public GeoCoordinate getLocation() {
 		return depot;
 	}
 
-	public Truck getTruck() {
+	@Override
+	public SolveCamion getSolveCamion() {
 		return this;
 	}
 
-	public ContainerSet getNextContainerSet() {
-		return nextContainerSet;
+	@Override
+	public SolveIlot getNextSolveIlot() {
+		return nextSolveIlot;
 	}
 
-	public void setNextContainerSet(ContainerSet nextContainerSet) {
-		this.nextContainerSet = nextContainerSet;
+	@Override
+	public void setNextSolveIlot(SolveIlot nextSolveIlot) {
+		this.nextSolveIlot = nextSolveIlot;
 	}
 	
 	/* get score
@@ -49,21 +67,21 @@ public class Truck {
 	 *   (see http://docs.jboss.org/optaplanner/release/6.2.0.Final/optaplanner-docs/html_single/index.html#fairnessScoreConstraints)
 	 */
 	public long getScore() {
-		if (nextContainerSet == null)
+		if (nextSolveIlot == null)
 			return 0;
 		// go to first container set
-		double circuitLength = depot.distanceTo(nextContainerSet.getLocation());
+		double circuitLength = depot.distanceTo(nextSolveIlot.getLocation());
 		int nbContainers = 1;
-		ContainerSet containerSet = nextContainerSet;
-		while (containerSet.getNextContainerSet() != null)
+		SolveIlot ilot = nextSolveIlot;
+		while (ilot.getNextSolveIlot() != null)
 		{
 			// go to next container set
-			circuitLength += containerSet.getLocation().distanceTo(containerSet.getNextContainerSet().getLocation());
-			containerSet = containerSet.getNextContainerSet();
+			circuitLength += ilot.getLocation().distanceTo(ilot.getNextSolveIlot().getLocation());
+			ilot = ilot.getNextSolveIlot();
 			nbContainers++;
 		}
 		// go back to depot
-		circuitLength += containerSet.getLocation().distanceTo(depot);
+		circuitLength += ilot.getLocation().distanceTo(depot);
 		
 		long scoreTime = ((long)circuitLength + nbContainers*3000) / 10;//reduce scale to avoid overflows
 		

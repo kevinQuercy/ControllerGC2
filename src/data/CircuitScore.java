@@ -14,8 +14,8 @@ public class CircuitScore implements EasyScoreCalculator<CircuitSolution>{
 	public HardSoftLongScore calculateScore(CircuitSolution solution) {
 		long softScore = 0;
 		
-		for (Truck truck: solution.getTruckList()) {
-			softScore += truck.getScore();
+		for (SolveCamion solveCamion: solution.getSolveCamionList()) {
+			softScore += solveCamion.getScore();
 		}
 		
 		return HardSoftLongScore.valueOf(0, softScore);

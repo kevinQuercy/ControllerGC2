@@ -1,8 +1,5 @@
 package data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -10,39 +7,31 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
 /** @file
  * 
- * Set of containers, in the same building
+ * Encapsulation de Ilot pour le calcul d'itineraire
  *
  */
 
 @PlanningEntity
-public class ContainerSet {
-	private List<Container> containers;
-	private GeoCoordinate location;
+public class SolveIlot implements Standstill {
+	protected Ilot ilot; // ilot encapsule
 	
     // Planning variables: changes during planning, between score calculations.
     protected Standstill previousStandstill;
 
     // Shadow variables
-    protected ContainerSet nextContainerSet;
-    protected Truck truck;
-
-    public ContainerSet() {
-    	super();
+    protected SolveIlot nextSolveIlot;
+    protected SolveCamion solveCamion;
+    
+    public SolveIlot() {
     }
-
-	public ContainerSet(GeoCoordinate location) {
-		super();
-		this.location = location;
-		containers = new ArrayList<>();
-	}
-	
-	public List<Container> getContainers() {
-		return containers;
-	}
-
-	public GeoCoordinate getLocation() {
-		return location;
-	}
+    
+    public SolveIlot(Ilot ilot) {
+    	this.ilot = ilot;
+    }
+    
+    public Ilot getIlot() {
+    	return ilot;
+    }
 
     @PlanningVariable(valueRangeProviderRefs = {"vehicleRange", "customerRange"},
             graphType = PlanningVariableGraphType.CHAINED)
@@ -55,34 +44,22 @@ public class ContainerSet {
 	}
 
     @AnchorShadowVariable(sourceVariableName = "previousStandstill")
-	public Truck getTruck() {
-		return truck;
+	public SolveCamion getSolveCamion() {
+		return solveCamion;
 	}
 
-	public void setTruck(Truck truck) {
-		this.truck = truck;
+	public void setSolveCamion(SolveCamion solveCamion) {
+		this.solveCamion = solveCamion;
 	}
 
-	public void addContainer(Container container) {
-		containers.add(container);
-	}
-	
-	public boolean isReadyForCollect() {
-		// check how many containers are full
-		int containersFull = 0;
-		for (Container container: containers) {
-			if (container.isReadyForCollect())
-				containersFull++;
-		}
-		return containersFull*100/containers.size() >= 60; // if 60% or more containers are full, need to collect the set
+	@Override
+	public SolveIlot getNextSolveIlot() {
+		return nextSolveIlot;
 	}
 
-	public ContainerSet getNextContainerSet() {
-		return nextContainerSet;
-	}
-
-	public void setNextContainerSet(ContainerSet nextContainerSet) {
-		this.nextContainerSet = nextContainerSet;
+	@Override
+	public void setNextSolveIlot(SolveIlot nextSolveIlot) {
+		this.nextSolveIlot = nextSolveIlot;
 	}
 	
     /**
@@ -100,7 +77,7 @@ public class ContainerSet {
      * @return a positive number, the distance in metres
      */
     public int getDistanceFrom(Standstill standstill) {
-        return (int)standstill.getLocation().distanceTo(location);
+        return (int)standstill.getLocation().distanceTo(getLocation());
     }
 
     /**
@@ -108,6 +85,11 @@ public class ContainerSet {
      * @return a positive number, the distance in metres
      */
     public int getDistanceTo(Standstill standstill) {
-        return (int)location.distanceTo(standstill.getLocation());
+        return (int)getLocation().distanceTo(standstill.getLocation());
     }
+
+    public GeoCoordinate getLocation() {
+    	return ilot.getLocation();
+    }
+
 }

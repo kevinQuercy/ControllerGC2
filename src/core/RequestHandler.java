@@ -1,5 +1,6 @@
 package core;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -10,6 +11,9 @@ import org.jdom2.Element;
 
 import DAOS.DAOFactory;
 import DAOS.DAOPlanification;
+import data.Camion;
+import data.CircuitSolution;
+import data.CircuitSolver;
 import data.Container;
 import data.ContainerSystem;
 import data.Conteneur;
@@ -18,6 +22,8 @@ import data.Ilot;
 import data.Ilotdepassage;
 import data.Itineraire;
 import data.Planification;
+import data.SolveCamion;
+import data.SolveIlot;
 
 /** @file
  * 
@@ -159,7 +165,79 @@ public class RequestHandler {
 	}
 	
 	private void handleTrigCircuitComputation(Element rootReq, Element rootResp) {
-		ContainerSystem.getContainerSystem().trigCircuitComputation();
+		try {
+			// ilots a collecter
+			List<SolveIlot> ilots_a_collecter = new ArrayList<>();
+			for (Ilot ilot: DAOFactory.creerDAOIlot().select()) {
+				if (ilot.isReadyForCollect())
+					ilots_a_collecter.add(new SolveIlot(ilot));
+			}
+			
+			// camions
+			List<SolveCamion> camions = new ArrayList<>();
+			for (Camion camion: DAOFactory.creerDAOCamion().select()) {
+				camions.add(new SolveCamion(camion, depot));
+			}
+
+			// construction du probleme
+			CircuitSolution problem = new CircuitSolution();
+			problem.setSolveIlotList(ilots_a_collecter);
+			problem.setSolveCamionList(camions);
+			
+			// resolution du probleme
+			CircuitSolver solver = new CircuitSolver();
+			CircuitSolution solution = solver.solve(problem);
+			
+			// sauvegarde de la solution dans la base
+			Planification planif = new Planification();
+			planif.set_date(new Date());
+			planif.set_taux(50); // ???
+			for (SolveCamion solveCamion: solution.getSolveCamionList()) {
+				Itineraire iti = new Itineraire(1/*typedechet*/, solveCamion.getCamion().get_id());
+				
+				int ilotIdx = 0;
+				double longueur = 0;
+				int poidsTotal = 0;
+				int volumteTotal = 0;
+				SolveIlot solveIlot = solveCamion.getNextSolveIlot();
+				GeoCoordinate prev_loc = solveCamion.getDepot(); // on demarre du depot
+				while (solveIlot != null) {
+					iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
+					
+					for (Conteneur conteneur: solveIlot.getIlot().get_conteneurs()) {
+						poidsTotal += conteneur.get_lastpoids();
+						volumteTotal += conteneur.get_lastvolume();
+					}
+					
+					longueur += prev_loc.distanceTo(solveIlot.getLocation());
+					prev_loc = solveIlot.getLocation();
+					
+					solveIlot = solveIlot.getNextSolveIlot();
+				}
+				longueur += prev_loc.distanceTo(solveCamion.getDepot()); // retour au depot
+				iti.set_longueur((int)longueur);
+				iti.set_poidstotal(poidsTotal);
+				iti.set_volumetotal(volumteTotal);
+
+				planif.ajouteritineraire(iti);
+			}
+
+			
+			DAOPlanification daoPlanif = DAOFactory.creerDAOPlanification();
+			// on supprime une éventuelle planification existante à cette date
+			try {
+				daoPlanif.deletebydate(planif.get_date());
+			} catch(Exception e) {
+				// rien à supprimer: OK
+			}
+			daoPlanif.insert(planif);
+			
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
+			buildResponseType(rootResp, "ERROR");
+			return;
+		}
+
 		buildResponseType(rootResp, "OK");
 	}
 	

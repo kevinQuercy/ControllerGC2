@@ -3,7 +3,7 @@
   <!--<environmentMode>FAST_ASSERT</environmentMode>-->
   <solutionClass>data.CircuitSolution</solutionClass>
   <entityClass>data.Standstill</entityClass>
-  <entityClass>data.ContainerSet</entityClass>
+  <entityClass>data.SolveIlot</entityClass>
 
   <scoreDirectorFactory>
     <scoreDefinitionType>HARD_SOFT_LONG</scoreDefinitionType>

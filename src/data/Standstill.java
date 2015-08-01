@@ -19,12 +19,12 @@ public interface Standstill {
     /**
      * @return sometimes null
      */
-    Truck getTruck();
+    SolveCamion getSolveCamion();
 
     /**
      * @return sometimes null
      */
     @InverseRelationShadowVariable(sourceVariableName = "previousStandstill")
-    ContainerSet getNextContainerSet();
-    void setNextContainerSet(ContainerSet nextContainerSet);
+    SolveIlot getNextSolveIlot();
+    void setNextSolveIlot(SolveIlot nextSolveIlot);
 }

@@ -32,8 +32,6 @@ public class ControllerMain {
 			}
 		}
 		
-		createContainerSystem(nbContainers);
-		
 		SocketManager socketMan = new SocketManager(server_port);
 		socketMan.run();
 	}
