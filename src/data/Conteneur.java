@@ -62,4 +62,13 @@ public class Conteneur {
 		this.lastpoids = poids;
 		this.lastupdate = new Date();
 	}
+	
+	public int get_fillratio() {
+		return 100*lastvolume/volumemax;
+	}
+	
+	// whether container should be collected
+	public boolean isReadyForCollect() {
+		return lastpoids >= 250 || get_fillratio() >= 75; 
+	}
 }

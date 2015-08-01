@@ -67,4 +67,18 @@ public class Ilot {
 	public void addconteneur(Conteneur c) {
 		this.conteneurs.add(c);
 	}
+	
+	public GeoCoordinate getLocation() {
+		return new GeoCoordinate(latitude, longitude);
+	}
+	
+	public boolean isReadyForCollect() {
+		// check how many containers are full
+		int containersFull = 0;
+		for (Conteneur conteneur: conteneurs) {
+			if (conteneur.isReadyForCollect())
+				containersFull++;
+		}
+		return containersFull*100/conteneurs.size() >= 60; // if 60% or more containers are full, need to collect the set
+	}
 }

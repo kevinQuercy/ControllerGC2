@@ -11,9 +11,9 @@ public class GeoCoordinate {
 	private double latitude;  // floating value in degrees, + for North, - for South
 	private double longitude; // floating value in degrees, + for East, - for West
 
-	public GeoCoordinate(double latitute, double longitude) {
+	public GeoCoordinate(double latitude, double longitude) {
 		super();
-		this.latitude = latitute;
+		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 	
@@ -21,8 +21,8 @@ public class GeoCoordinate {
 		return latitude;
 	}
 
-	public void setLatitude(double latitute) {
-		this.latitude = latitute;
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
 	}
 
 	public double getLongitude() {

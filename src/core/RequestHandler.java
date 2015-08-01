@@ -1,15 +1,23 @@
 package core;
 
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 
+import DAOS.DAOFactory;
+import DAOS.DAOPlanification;
 import data.Container;
-import data.ContainerSet;
 import data.ContainerSystem;
+import data.Conteneur;
 import data.GeoCoordinate;
+import data.Ilot;
+import data.Ilotdepassage;
+import data.Itineraire;
+import data.Planification;
 
 /** @file
  * 
@@ -41,6 +49,8 @@ import data.GeoCoordinate;
 
 public class RequestHandler {
 	private static Logger LOGGER = Logger.getLogger(RequestHandler.class.getName());
+
+	private static final GeoCoordinate depot = new GeoCoordinate(43.602704, 1.441745); // Toulouse center
 	
 	private int clientNumber;
 
@@ -107,9 +117,7 @@ public class RequestHandler {
 	}
 	
 	private void handleReqSupervisionState(Element rootReq, Element rootResp) {
-		buildResponseType(rootResp, "RESP_SUPERVISION_STATE");
 		Element eltSupervisionState = new Element("supervision_state");
-		rootResp.addContent(eltSupervisionState);
 		
 		//[Kevin] : envoi de date au client container supprim� et remplac� par un entier al�atoire
 		// � terme, il faudra renvoyer les donn�es pr�sentes dans la base en fonction de l'ID du container qui � envoy� la requ�te 
@@ -118,27 +126,36 @@ public class RequestHandler {
 		Element eltContainerSets = new Element("container_sets");
 		eltSupervisionState.addContent(eltContainerSets);
 		
-		for (ContainerSet cs: ContainerSystem.getContainerSystem().getContainerSets()) {
-			Element eltContainerSet = new Element("container_set");
-			eltContainerSets.addContent(eltContainerSet);
-			
-			addLocation(eltContainerSet, "location", cs.getLocation());
-			addFieldBool(eltContainerSet, "to_be_collected", cs.isReadyForCollect());
-			
-			Element eltContainers = new Element("containers");
-			eltContainerSet.addContent(eltContainers);
-			for (Container container: cs.getContainers()) {
-				Element eltContainer = new Element("container");
-				eltContainers.addContent(eltContainer);
+		try {
+			for (Ilot ilot: DAOFactory.creerDAOIlot().select()) {
+				Element eltContainerSet = new Element("container_set");
+				eltContainerSets.addContent(eltContainerSet);
 				
-				addFieldInt(eltContainer, "id", container.getContainerId());
-				addFieldInt(eltContainer, "weight", container.getWeight());
-				addFieldInt(eltContainer, "volume", container.getVolume());
-				addFieldInt(eltContainer, "volumemax", container.getVolumeMax());
-				addFieldInt(eltContainer, "fillratio", container.getFillRatio());
-				addFieldBool(eltContainer, "to_be_collected", container.isReadyForCollect());
+				addLocation(eltContainerSet, "location", ilot.getLocation());
+				addFieldBool(eltContainerSet, "to_be_collected", ilot.isReadyForCollect());
+				
+				Element eltContainers = new Element("containers");
+				eltContainerSet.addContent(eltContainers);
+				for (Conteneur conteneur: ilot.get_conteneurs()) {
+					Element eltContainer = new Element("container");
+					eltContainers.addContent(eltContainer);
+					
+					addFieldInt(eltContainer, "id", conteneur.get_id());
+					addFieldInt(eltContainer, "weight", conteneur.get_lastpoids());
+					addFieldInt(eltContainer, "volume", conteneur.get_lastvolume());
+					addFieldInt(eltContainer, "volumemax", conteneur.get_volumemax());
+					addFieldInt(eltContainer, "fillratio", conteneur.get_fillratio());
+					addFieldBool(eltContainer, "to_be_collected", conteneur.isReadyForCollect());
+				}
 			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
+			buildResponseType(rootResp, "ERROR");
+			return;
 		}
+
+		buildResponseType(rootResp, "RESP_SUPERVISION_STATE");
+		rootResp.addContent(eltSupervisionState);
 	}
 	
 	private void handleTrigCircuitComputation(Element rootReq, Element rootResp) {
@@ -154,21 +171,30 @@ public class RequestHandler {
 	}
 
 	private void handleReqCircuits(Element rootReq, Element rootResp) {
-		buildResponseType(rootResp, "RESP_CIRCUITS");
 		Element eltCircuits = new Element("circuits");
-		rootResp.addContent(eltCircuits);
-		
-		for (int i = 0; i < ContainerSystem.getContainerSystem().getCollectRoutes().size(); i++) {
-			eltCircuits.addContent(getCircuit(i));
-		}
+		try {
+			DAOPlanification daoplanification2 = DAOFactory.creerDAOPlanification();
+			Planification pla = daoplanification2.selectbydate(new Date());
 
+			for (int i = 0; i < pla.get_itineraires().size(); i++) {
+				eltCircuits.addContent(getItineraire(i, pla.get_itineraires().get(i)));
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
+			buildResponseType(rootResp, "ERROR");
+			return;
+		}
+		buildResponseType(rootResp, "RESP_CIRCUITS");
+		rootResp.addContent(eltCircuits);
+
+		// liste des ilots non collectés: pas implémenté
 		Element eltNotCollected = new Element("not_collected");
 		eltCircuits.addContent(eltNotCollected);
-		eltNotCollected.addContent(getContainerSets(ContainerSystem.getContainerSystem().getNotCollected()));
+		eltNotCollected.addContent(new Element("container_sets"));
 	}
 	
 	private void handleReqCircuit(Element rootReq, Element rootResp) {
-		int circuitIndex = Integer.valueOf(rootReq.getChild("circuit").getChildTextNormalize("index"));
+/*		int circuitIndex = Integer.valueOf(rootReq.getChild("circuit").getChildTextNormalize("index"));
 		if (circuitIndex < 0 || circuitIndex >= ContainerSystem.getContainerSystem().getCollectRoutes().size())
 		{
 			buildResponseType(rootResp, "ERROR"); // invalid circuit index
@@ -176,34 +202,36 @@ public class RequestHandler {
 		}
 		
 		buildResponseType(rootResp, "RESP_CIRCUIT");
-		rootResp.addContent(getCircuit(circuitIndex));
+		rootResp.addContent(getCircuit(circuitIndex));*/
+		buildResponseType(rootResp, "ERROR");
 	}
 	
-	private Element getCircuit(int circuitIndex) {
+	private Element getItineraire(int circuitIndex, Itineraire iti) {
 		Element eltCircuit = new Element("circuit");
 		addFieldInt(eltCircuit, "index", circuitIndex);
-		addLocation(eltCircuit, "depot_location", ContainerSystem.getContainerSystem().getDepot());
-		Element eltContainerSets = getContainerSets(ContainerSystem.getContainerSystem().getCollectRoutes().get(circuitIndex)); 
+		addLocation(eltCircuit, "depot_location", depot);
+		Element eltContainerSets = getIlotsdepassage(iti.get_ilotsdepassage()); 
 		eltCircuit.addContent(eltContainerSets);
 		return eltCircuit;
 	}
 	
-	private Element getContainerSets(List<ContainerSet> containerSets) {
+	private Element getIlotsdepassage(List<Ilotdepassage> ilotsdepassage) {
 		Element eltContainerSets = new Element("container_sets");
 		
-		for (ContainerSet containerSet: containerSets) {
+		for (Ilotdepassage ilotdepassage: ilotsdepassage) {
 			Element eltContainerSet = new Element("container_set");
 			eltContainerSets.addContent(eltContainerSet);
+			Ilot ilot = ilotdepassage.get_Ilot();
 			
-			addLocation(eltContainerSet, "location", containerSet.getLocation());
+			addLocation(eltContainerSet, "location", ilot.getLocation());
 			
 			Element eltContainers = new Element("containers");
 			eltContainerSet.addContent(eltContainers);
-			for (Container container: containerSet.getContainers()) {
+			for (Conteneur conteneur: ilot.get_conteneurs()) {
 				Element eltContainer = new Element("container");
 				eltContainers.addContent(eltContainer);
 				
-				addFieldInt(eltContainer, "id", container.getContainerId());
+				addFieldInt(eltContainer, "id", conteneur.get_id());
 			}
 		}
 		return eltContainerSets;
