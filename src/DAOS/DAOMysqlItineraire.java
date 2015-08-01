@@ -2,6 +2,7 @@ package DAOS;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,9 +13,10 @@ import data.Ilotdepassage;
 public class DAOMysqlItineraire implements DAOItineraire {
 
 	@Override
-	public List<Itineraire> selectbyplanificationid(int plid) throws Exception {
+	public List<Itineraire> selectbydate(Date d) throws Exception {
 		// recuperation des itineraires
-	    String sql = "SELECT * FROM Itineraire WHERE Planification_id = '" + plid + "';";
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	    String sql = "SELECT * FROM Itineraire WHERE Planification_date = '" + sdf.format(d) + "';";
         List<Itineraire> liste = new LinkedList<Itineraire>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
@@ -22,14 +24,18 @@ public class DAOMysqlItineraire implements DAOItineraire {
         Statement s = cnx.createStatement();
         ResultSet r = s.executeQuery(sql);
 		DAOIlotdepassage daoIlotdepassage = DAOFactory.creerDAOIlotdepassage();
+		r.beforeFirst();
         //traiter les réponses
         while (r.next()) {
         	Itineraire h = new Itineraire();
-            //récupérer les champs
             h.set_id(r.getInt("id"));
             h.set_Camion_id(r.getInt("Camion_id"));
+            h.set_longueur(r.getInt("longueur"));
+            h.set_volumetotal(r.getInt("volumetotal"));
+            h.set_poidstotal(r.getInt("poidstotal"));
+            h.set_Typedechets_id(r.getInt("Typedechets_id"));
+            h.set_Planification_date(r.getDate("Planification_date"));
 			h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
-            //ajouter à la liste
             liste.add(h);
         }
         r.close();
@@ -40,17 +46,52 @@ public class DAOMysqlItineraire implements DAOItineraire {
 		
         return liste;
 	}
+	
+	public Itineraire selectbydateetcamion(Date d,int camionid) throws Exception {
+		// recuperation des itineraires
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	    String sql = "SELECT * FROM Itineraire WHERE Planification_date = '" + sdf.format(d) + "' AND Camion_id = '"+ camionid +"';";
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+		DAOIlotdepassage daoIlotdepassage = DAOFactory.creerDAOIlotdepassage();
+		r.beforeFirst();
+        //traiter les réponses
+        r.next();
+    	Itineraire h = new Itineraire();
+        h.set_id(r.getInt("id"));
+        h.set_Planification_date(r.getDate("Planification_date"));
+        h.set_Camion_id(r.getInt("Camion_id"));
+        h.set_longueur(r.getInt("longueur"));
+        h.set_volumetotal(r.getInt("volumetotal"));
+        h.set_poidstotal(r.getInt("poidstotal"));
+        h.set_Typedechets_id(r.getInt("Typedechets_id"));
+		h.set_ilotsdepassage(daoIlotdepassage.selectbyitineraire(h));
+        r.close();
+        s.close();
+        cnx.close();
+		
+		// Recuperation de la liste des Ilotsdepassage
+		
+        return h;
+	}
 
 	@Override
 	public int insert(Itineraire it) throws Exception {
-	    String sql = "INSERT INTO Itineraire " + " (Camion_id,Planification_id) " + " VALUES( ";
+	    String sql = "INSERT INTO Itineraire (Planification_date,Camion_id,longueur,volumetotal,poidstotal,Typedechets_id) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
         Statement s = cnx.createStatement();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        sql += "'" + sdf.format(it.get_Planification_date()) + "',";
         sql += "'" + it.get_Camion_id() + "',";
-        sql += "'" + it.get_Planification_id() + "')";
-        System.out.println(sql);
+        sql += "'" + it.get_longueur() + "',";
+        sql += "'" + it.get_volumetotal() + "',";
+        sql += "'" + it.get_poidstotal() + "',";
+        sql += "'" + it.get_Typedechets_id() + "')";
         int n = s.executeUpdate(sql,Statement.RETURN_GENERATED_KEYS);
         ResultSet id = s.getGeneratedKeys();
         int lastid = 1;

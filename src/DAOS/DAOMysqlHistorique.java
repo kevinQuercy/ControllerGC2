@@ -3,6 +3,7 @@ import DAOS.DAOHistorique;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import data.Historique;
@@ -69,10 +70,28 @@ public class DAOMysqlHistorique implements DAOHistorique {
 
         return liste;
     }
+    
+    @Override
+    public Date selectderniervidage(int c) throws Exception {
+    	String sql = "SELECT MAX(date) FROM Historique WHERE Conteneur_id ='"+c+"' AND volume='0' AND poids='0';";
+        List<Historique> liste = new LinkedList<Historique>();
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+        r.next();
+        Date d = r.getTimestamp(1);
+        r.close();
+        s.close();
+        cnx.close();
+
+        return d;
+    }
 
     @Override
     public int insert(Historique h) throws Exception {
-        String sql = "INSERT INTO Historique " + " (conteneur_id,date,poids,volume) " + " VALUES( ";
+        String sql = "INSERT INTO Historique (conteneur_id,date,poids,volume) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
         //executer la requête
@@ -82,7 +101,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
         sql += "'" + sdf.format(h.get_date()) + "',";
         sql += "'" + h.get_poids() + "',";
         sql += "'" + h.get_volume() + "')";
-		// System.out.println ("\nsql :" + sqlInsert + "\n");
+		//System.out.println ("\nsql :" + sql + "\n");
         int n = s.executeUpdate(sql);
 
         s.close();
@@ -90,7 +109,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
         return n;
     }
 
-    @Override
+    /*@Override
     public int update(Historique h) throws Exception {
         String sqlUpdate = "UPDATE Historique " + " (conteneur_id,date,poids,volume) " + " VALUES (" ;
         //connexion
@@ -109,7 +128,7 @@ public class DAOMysqlHistorique implements DAOHistorique {
         s.close();
         cnx.close();
         return n;
-    }
+    }*/
     
     @Override
     public int delete(Historique h) throws Exception {

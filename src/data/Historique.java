@@ -4,10 +4,18 @@ import java.util.Date;
 public class Historique {
 	private int id;
 	private int Conteneur_id;
-	private Date date = new java.util.Date(); ;
+	private Date date;
 	private int poids;
 	private int volume;
 
+	public Historique(int contid,Date d,int p,int v) {
+		this.Conteneur_id=contid;
+		this.date=d;
+		this.poids=p;
+		this.volume=v;
+	}
+	public Historique(){
+	}
 	public int get_id() {
 		return this.id;
 	}

@@ -7,8 +7,8 @@ import java.sql.DriverManager;
 public class BDManager {
     private static String url = "jdbc:mysql://localhost:3306/garbagecollector";
     private static String driver = "com.mysql.jdbc.Driver";
-    private static String login = "garbagecollector";
-    private static String password = "t2byts!";
+    private static String login = "root";
+    private static String password = "";
     
     public static Connection getConnexion() throws Exception{
         Class c = Class.forName(driver);
