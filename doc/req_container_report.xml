@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<request>
+	<request_type>CONTAINER_REPORT</request_type>
+	<container_report>
+		<id>1</id>
+		<weight>110</weight>
+		<volume>75</volume>
+		<fillratio>62</fillratio>
+	</container_report>
+</request>
+
