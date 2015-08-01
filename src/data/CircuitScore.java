@@ -12,13 +12,12 @@ public class CircuitScore implements EasyScoreCalculator<CircuitSolution>{
 
 	@Override
 	public HardSoftLongScore calculateScore(CircuitSolution solution) {
-		long softScore = 0;
+		HardSoftLongScore score = HardSoftLongScore.valueOf(0, 0);
 		
 		for (SolveCamion solveCamion: solution.getSolveCamionList()) {
-			softScore += solveCamion.getScore();
+			score = score.add(solveCamion.getScore());
 		}
 		
-		return HardSoftLongScore.valueOf(0, softScore);
+		return score;
 	}
-
 }

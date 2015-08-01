@@ -2,7 +2,8 @@ package DAOS;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import DAOS.DAOIlotdepassage;
@@ -14,29 +15,32 @@ public class DAOMysqlIlotdepassage implements DAOIlotdepassage {
 	@Override
 	public List<Ilotdepassage> selectbyitineraire(Itineraire i) throws Exception {
 	    String sql = "SELECT * FROM Ilotdepassage WHERE Itineraire_id = '" + i.get_id() + "';";
-        List<Ilotdepassage> liste = new LinkedList<Ilotdepassage>();
+        List<Ilotdepassage> liste = new ArrayList<Ilotdepassage>();
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
-        //faire la requête
+        //faire la requï¿½te
         Statement s = cnx.createStatement();
         
         ResultSet r = s.executeQuery(sql);
 
-        //traiter les réponses
+        //traiter les rï¿½ponses
         while (r.next()) {
         	Ilotdepassage h = new Ilotdepassage();
-            //récupérer les champs
+            //rï¿½cupï¿½rer les champs
         	DAOIlot daoilot = DAOFactory.creerDAOIlot();
             h.set_ilot(daoilot.selectbyid(r.getInt("Ilot_id")));
             h.set_Itineraire_id(r.getInt("Itineraire_id"));
             h.set_ordre(r.getInt("ordre"));
-            //ajouter à la liste
+            //ajouter ï¿½ la liste
             liste.add(h);
         }
 
         r.close();
         s.close();
         cnx.close();
+        
+        //trier la liste dans l'ordre de parcours
+        Collections.sort(liste);
 
         return liste;
 	}
@@ -46,7 +50,7 @@ public class DAOMysqlIlotdepassage implements DAOIlotdepassage {
 	    String sql = "INSERT INTO Ilotdepassage " + " (Itineraire_id,Ilot_id,ordre) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
-        //executer la requête
+        //executer la requï¿½te
         Statement s = cnx.createStatement();
         sql += "'" + it.get_Itineraire_id() + "',";
         sql += "'" + it.get_Ilot().get_id() + "',";

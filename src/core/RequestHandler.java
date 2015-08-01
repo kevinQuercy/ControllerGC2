@@ -24,6 +24,7 @@ import data.Planification;
 import data.SolveCamion;
 import data.SolveIlot;
 import data.Typedechets;
+import data.SolveCamion.ItineraireValues;
 
 /** @file
  * 
@@ -201,7 +202,7 @@ public class RequestHandler {
 					// camions
 					List<SolveCamion> camions = new ArrayList<>();
 					for (Camion camion: DAOFactory.creerDAOCamion().select()) {
-						if (camion.get_Typedechets_id() == type_dechet.get_id())
+						if (camion.get_disponible() && camion.get_Typedechets_id() == type_dechet.get_id())
 							camions.add(new SolveCamion(camion, depot));
 					}
 		
@@ -219,28 +220,15 @@ public class RequestHandler {
 						Itineraire iti = new Itineraire(type_dechet.get_id(), solveCamion.getCamion().get_id());
 						
 						int ilotIdx = 0;
-						double longueur = 0;
-						int poidsTotal = 0;
-						int volumteTotal = 0;
 						SolveIlot solveIlot = solveCamion.getNextSolveIlot();
-						GeoCoordinate prev_loc = solveCamion.getDepot(); // on demarre du depot
 						while (solveIlot != null) {
 							iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
-							
-							for (Conteneur conteneur: solveIlot.getIlot().get_conteneurs()) {
-								poidsTotal += conteneur.get_lastpoids();
-								volumteTotal += conteneur.get_lastvolume();
-							}
-							
-							longueur += prev_loc.distanceTo(solveIlot.getLocation());
-							prev_loc = solveIlot.getLocation();
-							
 							solveIlot = solveIlot.getNextSolveIlot();
 						}
-						longueur += prev_loc.distanceTo(solveCamion.getDepot()); // retour au depot
-						iti.set_longueur((int)longueur);
-						iti.set_poidstotal(poidsTotal);
-						iti.set_volumetotal(volumteTotal);
+						ItineraireValues values = solveCamion.getItineraireValues();
+						iti.set_longueur(values.longueur);
+						iti.set_poidstotal(values.poidsTotal);
+						iti.set_volumetotal(values.volumeTotal);
 		
 						planif.ajouteritineraire(iti);
 					}

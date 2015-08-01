@@ -1,6 +1,6 @@
 package data;
 
-public class Ilotdepassage {
+public class Ilotdepassage implements Comparable<Ilotdepassage> {
 	private Ilot ilot;
 	private int Itineraire_id;
 	private int ordre;
@@ -28,5 +28,11 @@ public class Ilotdepassage {
 	}
 	public void set_ordre(int i) {
 		this.ordre = i;
+	}
+	
+	// relation d'ordre = ordre de parcours
+	@Override
+	public int compareTo(Ilotdepassage ilot) {
+		return ordre - ilot.ordre;
 	}
 }
