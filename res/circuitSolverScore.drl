@@ -17,13 +17,13 @@
 package data;
     dialect "java"
 
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScoreHolder;
 
 import data.Truck;
 import data.CircuitSolution;
 import data.ContainerSet;
 
-global HardSoftScoreHolder scoreHolder;
+global HardSoftLongScoreHolder scoreHolder;
 
 // ############################################################################
 // Hard constraints
@@ -45,7 +45,7 @@ end
 // ############################################################################
 // Soft constraints
 // ############################################################################
-
+/*
 rule "distanceToPreviousStandstill"
     when
         $containerSet : ContainerSet(previousStandstill != null, $distanceFromPreviousStandstill : distanceFromPreviousStandstill)
@@ -60,6 +60,19 @@ rule "distanceFromLastCustomerToDepot"
     then
         Truck truck = $containerSet.getTruck();
         scoreHolder.addSoftConstraintMatch(kcontext, - $containerSet.getDistanceTo(truck));
+end
+*/
+
+// evaluate time by using distance + a fixed time for each ContainerSet
+// distance is in metres, truck move at 10 m/s, so unit is 0.1 second
+// take square to search solutions that is balancing circuit time between all trucks
+// Not working => use easyScoreCalculatorClass instead
+rule "squareCircuitTime"
+	when
+		$truck: Truck()
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -circuitTime*circuitTime);*/
+        scoreHolder.addSoftConstraintMatch(kcontext, $truck.getScore());
 end
 
 

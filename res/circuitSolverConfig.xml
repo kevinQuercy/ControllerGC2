@@ -6,10 +6,10 @@
   <entityClass>data.ContainerSet</entityClass>
 
   <scoreDirectorFactory>
-    <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
-    <!--<easyScoreCalculatorClass>org.optaplanner.examples.vehiclerouting.solver.score.VehicleRoutingEasyScoreCalculator</easyScoreCalculatorClass>-->
+    <scoreDefinitionType>HARD_SOFT_LONG</scoreDefinitionType>
+    <easyScoreCalculatorClass>data.CircuitScore</easyScoreCalculatorClass>
     <!--<incrementalScoreCalculatorClass>org.optaplanner.examples.vehiclerouting.solver.score.VehicleRoutingIncrementalScoreCalculator</incrementalScoreCalculatorClass>-->
-    <scoreDrl>circuitSolverScore.drl</scoreDrl>
+    <!--<scoreDrl>circuitSolverScore.drl</scoreDrl>-->
     <!--<assertionScoreDirectorFactory>-->
       <!--<easyScoreCalculatorClass>org.optaplanner.examples.vehiclerouting.solver.score.VehicleRoutingEasyScoreCalculator</easyScoreCalculatorClass>-->
     <!--</assertionScoreDirectorFactory>-->
@@ -17,7 +17,7 @@
   </scoreDirectorFactory>
 
   <termination>
-    <minutesSpentLimit>1</minutesSpentLimit>
+    <unimprovedSecondsSpentLimit>10</unimprovedSecondsSpentLimit>
   </termination>
   <constructionHeuristic>
     <constructionHeuristicType>FIRST_FIT</constructionHeuristicType>

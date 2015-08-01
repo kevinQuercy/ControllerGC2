@@ -99,17 +99,17 @@ public class ContainerSet implements Standstill {
 
     /**
      * @param standstill never null
-     * @return a positive number, the distance multiplied by 1000 to avoid floating point arithmetic rounding errors
+     * @return a positive number, the distance in metres
      */
     public int getDistanceFrom(Standstill standstill) {
-        return (int)(1000*standstill.getLocation().distanceTo(location));
+        return (int)standstill.getLocation().distanceTo(location);
     }
 
     /**
      * @param standstill never null
-     * @return a positive number, the distance multiplied by 1000 to avoid floating point arithmetic rounding errors
+     * @return a positive number, the distance in metres
      */
     public int getDistanceTo(Standstill standstill) {
-        return (int)(1000*location.distanceTo(standstill.getLocation()));
+        return (int)location.distanceTo(standstill.getLocation());
     }
 }

@@ -8,13 +8,13 @@ import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 
 @PlanningSolution
-public class CircuitSolution implements Solution<HardSoftScore> {
+public class CircuitSolution implements Solution<HardSoftLongScore> {
     protected List<Truck> truckList;
 	protected List<ContainerSet> containerSetList;
-	protected HardSoftScore score;
+	protected HardSoftLongScore score;
 
     @PlanningEntityCollectionProperty
     @ValueRangeProvider(id = "vehicleRange")
@@ -36,11 +36,11 @@ public class CircuitSolution implements Solution<HardSoftScore> {
         this.containerSetList = containerSetList;
     }
 
-    public HardSoftScore getScore() {
+    public HardSoftLongScore getScore() {
         return score;
     }
 
-    public void setScore(HardSoftScore score) {
+    public void setScore(HardSoftLongScore score) {
         this.score = score;
     }
 
