@@ -22,6 +22,9 @@ public class Camion {
 	public int get_poidsmax(){
 		return this.poidsmax;
 	}
+	public int get_poidsmax_kg(){
+		return this.poidsmax*1000;
+	}
 	public int get_volumemax(){
 		return this.volumemax;
 	}

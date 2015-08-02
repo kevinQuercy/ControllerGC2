@@ -205,32 +205,34 @@ public class RequestHandler {
 						if (camion.get_disponible() && camion.get_Typedechets_id() == type_dechet.get_id())
 							camions.add(new SolveCamion(camion, depot));
 					}
-		
-					// construction du probleme
-					CircuitSolution problem = new CircuitSolution();
-					problem.setSolveIlotList(ilots_a_collecter);
-					problem.setSolveCamionList(camions);
 					
-					// resolution du probleme
-					CircuitSolver solver = new CircuitSolver();
-					CircuitSolution solution = solver.solve(problem);
-					
-					// sauvegarde de la solution dans la base
-					for (SolveCamion solveCamion: solution.getSolveCamionList()) {
-						Itineraire iti = new Itineraire(type_dechet.get_id(), solveCamion.getCamion().get_id());
+					if (camions.size() > 0) {
+						// construction du probleme
+						CircuitSolution problem = new CircuitSolution();
+						problem.setSolveIlotList(ilots_a_collecter);
+						problem.setSolveCamionList(camions);
 						
-						int ilotIdx = 0;
-						SolveIlot solveIlot = solveCamion.getNextSolveIlot();
-						while (solveIlot != null) {
-							iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
-							solveIlot = solveIlot.getNextSolveIlot();
+						// resolution du probleme
+						CircuitSolver solver = new CircuitSolver();
+						CircuitSolution solution = solver.solve(problem);
+						
+						// sauvegarde de la solution dans la base
+						for (SolveCamion solveCamion: solution.getSolveCamionList()) {
+							Itineraire iti = new Itineraire(type_dechet.get_id(), solveCamion.getCamion().get_id());
+							
+							int ilotIdx = 0;
+							SolveIlot solveIlot = solveCamion.getNextSolveIlot();
+							while (solveIlot != null) {
+								iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
+								solveIlot = solveIlot.getNextSolveIlot();
+							}
+							ItineraireValues values = solveCamion.getItineraireValues();
+							iti.set_longueur(values.longueur);
+							iti.set_poidstotal(values.poidsTotal);
+							iti.set_volumetotal(values.volumeTotal);
+			
+							planif.ajouteritineraire(iti);
 						}
-						ItineraireValues values = solveCamion.getItineraireValues();
-						iti.set_longueur(values.longueur);
-						iti.set_poidstotal(values.poidsTotal);
-						iti.set_volumetotal(values.volumeTotal);
-		
-						planif.ajouteritineraire(iti);
 					}
 				} // if ilots_a_collecter.size() > 0
 			} // for typedechet

@@ -14,12 +14,14 @@ public class SolveCamion implements Standstill {
 		public int poidsTotal; // kg
 		public int volumeTotal; // L
 		public int nbIlots;
+		public int nbVidages; // nombre de vidages pendant l'itineraire (camion plein)
 		
 		public ItineraireValues() {
 			longueur = 0;
 			poidsTotal = 0;
 			volumeTotal = 0;
 			nbIlots = 0;
+			nbVidages = 0;
 		}
 	}
 	
@@ -71,33 +73,48 @@ public class SolveCamion implements Standstill {
 	}
 
 	public ItineraireValues getItineraireValues() {
+		ItineraireValues result = new ItineraireValues();
 		double longueur = 0;
-		int poidsTotal = 0;
-		int volumeTotal = 0;
-		int nbIlots = 0;
+		int poidsCourant = 0; // poids courant dans le camion
+		int volumeCourant = 0; // volume courant dans le camion
 		SolveIlot solveIlot = nextSolveIlot;
 		GeoCoordinate prev_loc = depot; // on demarre du depot
 		while (solveIlot != null) {
+			// obtenir volume et poids de l'ilot pour ce dechet
+			int poidsIlot = 0;
+			int volumeIlot = 0;
 			for (Conteneur conteneur: solveIlot.getIlot().get_conteneurs()) {
 				if (conteneur.get_TypeDechets_id() == camion.get_Typedechets_id()) {
-					poidsTotal += conteneur.get_lastpoids();
-					volumeTotal += conteneur.get_lastvolume();
+					poidsIlot += conteneur.get_lastpoids();
+					volumeIlot += conteneur.get_lastvolume();
 				}
 			}
+			
+			if (poidsCourant + poidsIlot > camion.get_poidsmax_kg() || volumeCourant + volumeIlot > camion.get_volumemax())
+			{
+				// on doit passer au depot AVANT cet ilot pour vider
+				longueur += prev_loc.distanceTo(depot);
+				prev_loc = depot;
+				result.nbVidages++;
+				poidsCourant = 0;
+				volumeCourant = 0;
+			}
+			
+			// traitement de l'ilot
+			poidsCourant += poidsIlot;
+			volumeCourant += volumeIlot;
+			result.poidsTotal += poidsIlot;
+			result.volumeTotal += volumeIlot;
 			
 			longueur += prev_loc.distanceTo(solveIlot.getLocation());
 			prev_loc = solveIlot.getLocation();
 			
 			solveIlot = solveIlot.getNextSolveIlot();
-			nbIlots++;
+			result.nbIlots++;
 		}
 		longueur += prev_loc.distanceTo(depot); // retour au depot
 
-		ItineraireValues result = new ItineraireValues();
 		result.longueur = (int)longueur;
-		result.poidsTotal = poidsTotal;
-		result.volumeTotal = volumeTotal;
-		result.nbIlots = nbIlots;
 		return result;
 	}
 
@@ -118,13 +135,13 @@ public class SolveCamion implements Standstill {
 
 		// determine overload, as hard score
 		long overload = 0;
-		if (values.poidsTotal > camion.get_poidsmax()*1000)
-			overload += values.poidsTotal - camion.get_poidsmax()*1000;
+		if (values.poidsTotal > camion.get_poidsmax_kg())
+			overload += values.poidsTotal - camion.get_poidsmax_kg();
 		if (values.volumeTotal > camion.get_volumemax())
 			overload += values.volumeTotal - camion.get_volumemax();
 		
 		// determine ~time, as soft score 
-		long scoreTime = ((long)values.longueur + values.nbIlots*3000) / 10; // reduce scale to avoid overflow
+		long scoreTime = ((long)values.longueur + (values.nbIlots+values.nbVidages)*3000) / 10; // reduce scale to avoid overflow
 		
 		return HardSoftLongScore.valueOf(-overload, -scoreTime*scoreTime);
 	}
