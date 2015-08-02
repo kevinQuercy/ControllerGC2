@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <request>
 	<request_type>REQ_CIRCUIT</request_type>
-	<circuit><index>0</index></circuit>
+	<circuit><index>1</index></circuit>
 </request>
 

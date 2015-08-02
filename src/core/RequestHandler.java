@@ -12,6 +12,7 @@ import org.jdom2.Element;
 
 import DAOS.DAOConteneur;
 import DAOS.DAOFactory;
+import DAOS.DAOItineraire;
 import DAOS.DAOPlanification;
 import data.Camion;
 import data.CircuitSolution;
@@ -261,8 +262,8 @@ public class RequestHandler {
 	private void handleReqCircuits(Element rootReq, Element rootResp) {
 		Element eltCircuits = new Element("circuits");
 		try {
-			DAOPlanification daoplanification2 = DAOFactory.creerDAOPlanification();
-			Planification pla = daoplanification2.selectbydate(new Date());
+			DAOPlanification daoplanification = DAOFactory.creerDAOPlanification();
+			Planification pla = daoplanification.selectbydate(new Date());
 
 			for (int i = 0; i < pla.get_itineraires().size(); i++) {
 				eltCircuits.addContent(getItineraire(i, pla.get_itineraires().get(i)));
@@ -282,16 +283,20 @@ public class RequestHandler {
 	}
 	
 	private void handleReqCircuit(Element rootReq, Element rootResp) {
-/*		int circuitIndex = Integer.valueOf(rootReq.getChild("circuit").getChildTextNormalize("index"));
-		if (circuitIndex < 0 || circuitIndex >= ContainerSystem.getContainerSystem().getCollectRoutes().size())
-		{
-			buildResponseType(rootResp, "ERROR"); // invalid circuit index
+		Element eltItineraire;
+		try {
+			int circuitIndex = Integer.valueOf(rootReq.getChild("circuit").getChildTextNormalize("index"));
+			DAOItineraire daoItineraire = DAOFactory.creerDAOItineraire();
+			Itineraire iti = daoItineraire.selectbydateetcamion(new Date(), circuitIndex);
+
+			eltItineraire = getItineraire(circuitIndex, iti);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
+			buildResponseType(rootResp, "ERROR");
 			return;
 		}
-		
 		buildResponseType(rootResp, "RESP_CIRCUIT");
-		rootResp.addContent(getCircuit(circuitIndex));*/
-		buildResponseType(rootResp, "ERROR");
+		rootResp.addContent(eltItineraire);
 	}
 	
 	private Element getItineraire(int circuitIndex, Itineraire iti) {
