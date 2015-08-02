@@ -1,6 +1,7 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -19,12 +20,14 @@ import data.Conteneur;
 import data.GeoCoordinate;
 import data.Ilot;
 import data.Ilotdepassage;
+import data.Ilotsavider;
+import data.Ilotsglobalsavider;
 import data.Itineraire;
 import data.Planification;
 import data.SolveCamion;
+import data.SolveCamion.ItineraireValues;
 import data.SolveIlot;
 import data.Typedechets;
-import data.SolveCamion.ItineraireValues;
 
 /** @file
  * 
@@ -58,6 +61,8 @@ public class RequestHandler {
 	private static Logger LOGGER = Logger.getLogger(RequestHandler.class.getName());
 
 	private static final GeoCoordinate depot = new GeoCoordinate(43.602704, 1.441745); // Toulouse center
+	private static final int tauxRemplissage = 70; // taux remplissage pour declencher la collecte
+	private static final int delaiLimiteToutVenant = 3; // jours maxi pour relever le tout venant
 	
 	private int clientNumber;
 
@@ -184,58 +189,50 @@ public class RequestHandler {
 	
 	private void handleTrigCircuitComputation(Element rootReq, Element rootResp) {
 		try {
+			CircuitSolver solver = new CircuitSolver();
 			Planification planif = new Planification();
 			planif.set_date(new Date());
-			planif.set_taux(50); // ???
+			planif.set_taux(tauxRemplissage);
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.DATE, -delaiLimiteToutVenant);
+			Date datelimite = cal.getTime();
+			Ilotsglobalsavider etatglobal = new Ilotsglobalsavider(tauxRemplissage,datelimite);
 
-			// on traite un type de dechet a la fois
-			for (Typedechets type_dechet: DAOFactory.creerDAOTypedechets().select()) {
-
-				// ilots a collecter
-				List<SolveIlot> ilots_a_collecter = new ArrayList<>();
-				for (Ilot ilot: DAOFactory.creerDAOIlot().select()) {
-					if (ilot.isReadyForCollect(type_dechet))
+			for (Ilotsavider ilotsavider: etatglobal.get_ilotsavider()) {
+				if (ilotsavider.get_ilots().size() > 0 && ilotsavider.get_camions().size() > 0) {
+					// construction du probleme
+					List<SolveIlot> ilots_a_collecter = new ArrayList<>();
+					for (Ilot ilot: ilotsavider.get_ilots())
 						ilots_a_collecter.add(new SolveIlot(ilot));
-				}
-				
-				if (ilots_a_collecter.size() > 0) {
-					// camions
 					List<SolveCamion> camions = new ArrayList<>();
-					for (Camion camion: DAOFactory.creerDAOCamion().select()) {
-						if (camion.get_disponible() && camion.get_Typedechets_id() == type_dechet.get_id())
-							camions.add(new SolveCamion(camion, depot));
-					}
+					for (Camion camion: ilotsavider.get_camions())
+						camions.add(new SolveCamion(camion, depot));
+					CircuitSolution problem = new CircuitSolution();
+					problem.setSolveIlotList(ilots_a_collecter);
+					problem.setSolveCamionList(camions);
 					
-					if (camions.size() > 0) {
-						// construction du probleme
-						CircuitSolution problem = new CircuitSolution();
-						problem.setSolveIlotList(ilots_a_collecter);
-						problem.setSolveCamionList(camions);
+					// resolution du probleme
+					CircuitSolution solution = solver.solve(problem);
+					
+					// sauvegarde de la solution dans la base
+					for (SolveCamion solveCamion: solution.getSolveCamionList()) {
+						Itineraire iti = new Itineraire(ilotsavider.get_typedechets(), solveCamion.getCamion().get_id());
 						
-						// resolution du probleme
-						CircuitSolver solver = new CircuitSolver();
-						CircuitSolution solution = solver.solve(problem);
-						
-						// sauvegarde de la solution dans la base
-						for (SolveCamion solveCamion: solution.getSolveCamionList()) {
-							Itineraire iti = new Itineraire(type_dechet.get_id(), solveCamion.getCamion().get_id());
-							
-							int ilotIdx = 0;
-							SolveIlot solveIlot = solveCamion.getNextSolveIlot();
-							while (solveIlot != null) {
-								iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
-								solveIlot = solveIlot.getNextSolveIlot();
-							}
-							ItineraireValues values = solveCamion.getItineraireValues();
-							iti.set_longueur(values.longueur);
-							iti.set_poidstotal(values.poidsTotal);
-							iti.set_volumetotal(values.volumeTotal);
-			
-							planif.ajouteritineraire(iti);
+						int ilotIdx = 0;
+						SolveIlot solveIlot = solveCamion.getNextSolveIlot();
+						while (solveIlot != null) {
+							iti.ajouterilot(solveIlot.getIlot(), ilotIdx++);
+							solveIlot = solveIlot.getNextSolveIlot();
 						}
+						ItineraireValues values = solveCamion.getItineraireValues();
+						iti.set_longueur(values.longueur);
+						iti.set_poidstotal(values.poidsTotal);
+						iti.set_volumetotal(values.volumeTotal);
+		
+						planif.ajouteritineraire(iti);
 					}
-				} // if ilots_a_collecter.size() > 0
-			} // for typedechet
+				} // if ilots et camions pour collecte
+			} // for Ilotsavider
 			
 			DAOPlanification daoPlanif = DAOFactory.creerDAOPlanification();
 			// on supprime une éventuelle planification existante à cette date
