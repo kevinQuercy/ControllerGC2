@@ -11,7 +11,7 @@ public class Ilotsavider {
 	private int poidstotal;
 
 	
-	public Ilotsavider(int typedechets) {
+	public Ilotsavider(int typedechets)  {
 		this.ilots = new LinkedList<Ilot>();
 		this.camions = new LinkedList<Camion>();
 		this.typedechets = typedechets;

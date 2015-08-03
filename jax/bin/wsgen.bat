@@ -54,9 +54,8 @@ echo JAXWS_HOME must be set before running this script
 goto END
 
 :CHECKJAVAHOME
-if not "%JAVA_HOME%" == "" goto USE_JAVA_HOME
-
-set JAVA=java
+set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_25
+set JAVA="%JAVA_HOME%\bin\java"
 goto LAUNCH
 
 :USE_JAVA_HOME

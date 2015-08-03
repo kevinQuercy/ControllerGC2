@@ -29,7 +29,7 @@ import webservice.WSPlanificationImp;
 public class GC2Toolbox {
 	public static void main(String[] args) {
 		//Endpoint.publish("http://localhost:8081/WS/WSPlanification", new WSPlanificationImp());
-		Endpoint.publish("http://localhost:8081/WS/WSConteneur", new WSConteneurImp());
+		//Endpoint.publish("http://localhost:8081/WS/WSConteneur", new WSConteneurImp());
 		while(true) {
 			try {
 				GC2Toolbox.menu();
@@ -66,6 +66,7 @@ public class GC2Toolbox {
 			case "0" : System.out.println ("L'application s'arrete");System.exit(0);
 		}
 		GC2Toolbox.menu();
+		sc.close();
 	}
 	//////////////////////////////////////////////////////////////////////
 	// Faire collecte du jour
@@ -248,6 +249,7 @@ public class GC2Toolbox {
 		System.out.println ("last volume  : " + c.get_lastvolume());
 		
 		System.out.println ("\nFin de la mise à jour");
+		sc.close();
 	}
 	//////////////////////////////////////////////////////////////////////
 	// Suppression de la planification du jour
@@ -386,6 +388,7 @@ public class GC2Toolbox {
 		}
 		System.out.print ("\n\n");
 		System.out.println ("\nFin de l'affichage");
+		sc.close();
 	}
 	private static void affichertitre(String t) {
 		System.out.println ("\n\n#######################################################");

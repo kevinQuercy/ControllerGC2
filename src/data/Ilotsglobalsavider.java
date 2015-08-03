@@ -25,7 +25,7 @@ public class Ilotsglobalsavider {
 		DAOCamion daocamion = DAOFactory.creerDAOCamion();
 		List<Camion> camionsdisponibles = daocamion.selectdisponible();
 		System.out.println ("Nombre de camions disponibles : " + camionsdisponibles.size());
-		// Pour tous les types de dechets
+		// Pour tous les types de dechets 
 		for ( int i = 0 ; i < touslesdechets.size(); i++ ) {
 			int poidstotal = 0;
 			int volumetotal = 0;

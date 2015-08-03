@@ -22,16 +22,15 @@ public class DAOMysqlIlotdepassage implements DAOIlotdepassage {
         Statement s = cnx.createStatement();
         
         ResultSet r = s.executeQuery(sql);
-
-        //traiter les rï¿½ponses
+        //traiter les reponses
         while (r.next()) {
         	Ilotdepassage h = new Ilotdepassage();
-            //rï¿½cupï¿½rer les champs
         	DAOIlot daoilot = DAOFactory.creerDAOIlot();
             h.set_ilot(daoilot.selectbyid(r.getInt("Ilot_id")));
+            h.set_Ilot_id(r.getInt("Ilot_id"));
             h.set_Itineraire_id(r.getInt("Itineraire_id"));
             h.set_ordre(r.getInt("ordre"));
-            //ajouter ï¿½ la liste
+            //ajouter à la liste
             liste.add(h);
         }
 
