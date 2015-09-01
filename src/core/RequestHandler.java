@@ -90,6 +90,10 @@ public class RequestHandler {
 				handleReqSupervisionState(rootReq, rootResp);
 				break;
 				
+			case "REQ_ALL_CONTAINERS":
+				handleReqAllContainers(rootReq,rootResp);
+				break;
+				
 			case "TRIG_CIRCUIT_COMPUTATION":
 				handleTrigCircuitComputation(rootReq, rootResp);
 				break;
@@ -111,25 +115,59 @@ public class RequestHandler {
 		return response;
 	}
 	
-	private void handleContainerReport(Element rootReq, Element rootResp) {
+	private void handleReqAllContainers(Element rootReq, Element rootResp) {
 		try {
-			// get container ID
-			Element eltContRep = rootReq.getChild("container_report");
-			int containerId = Integer.valueOf(eltContRep.getChild("id").getTextNormalize());
-		
+			
 			// get container object associated to this ID
 			DAOConteneur daoConteneur = DAOFactory.creerDAOConteneur();
-			Conteneur conteneur = daoConteneur.selectbyid(containerId);
-		
-			// update container state
-			conteneur.majetat(
-					Integer.valueOf(eltContRep.getChild("volume").getTextNormalize()),
-					Integer.valueOf(eltContRep.getChild("weight").getTextNormalize())
-			);
+			List<Conteneur> conteneurs = daoConteneur.select();
+			System.out.println(conteneurs);
 			
-			// MAJ en BDD
-			daoConteneur.majetat(conteneur);
+			Element eltContainers= new Element("containers");
+			
+			//[Kevin] : envoi de date au client container supprimé et remplacé par un entier aléatoire
+			// à terme, il faudra renvoyer les données présentes dans la base en fonction de l'ID du container qui à envoyé la requête 
+			//addField(eltContainers, "containersList", conteneurs);
+			
 		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
+			buildResponseType(rootResp, "ERROR");
+			return;
+		}
+		buildResponseType(rootResp, "OK");
+		
+	}
+	
+	private void handleContainerReport(Element rootReq, Element rootResp) {
+		try {
+
+			Element eltContRep = rootReq.getChild("container_report");
+			int containerId = Integer.valueOf(eltContRep.getChild("id").getTextNormalize());
+			int containerVolume = Integer.valueOf(eltContRep.getChild("volume").getTextNormalize());
+			
+			DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
+			List<Conteneur> conteneurs = daoconteneur.select();
+			
+					Conteneur c = conteneurs.get(containerId);
+					int max = c.get_volumemax();
+					int current = c.get_lastvolume();
+					int poids = c.get_lastpoids();
+					int min = max/2;
+					if(c.get_TypeDechets_id()==2) {
+						min = (int)max/3;
+					}
+					if(c.get_TypeDechets_id()==3) {
+						min = 0;
+					}
+					int volume = (int) (max);
+					int maxpoids = 350;
+					int minpoids = 30;
+					int newpoids = (int)(Math.random() * (maxpoids-minpoids)+minpoids);
+					c.majetat(containerVolume,volume);
+					System.out.println ("Conteneur: " + (c.get_id()-1) + " | Volmax: " + max + " | Oldvol: " + current + " | Newvol: " + containerVolume +" | OldPoids: " + poids +" | Newpoids: " + newpoids);
+					daoconteneur.majetat(c);
+				
+			} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
 			buildResponseType(rootResp, "ERROR");
 			return;
@@ -141,14 +179,14 @@ public class RequestHandler {
 	private void handleReqSupervisionState(Element rootReq, Element rootResp) {
 		Element eltSupervisionState = new Element("supervision_state");
 		
-		//[Kevin] : envoi de date au client container supprimï¿½ et remplacï¿½ par un entier alï¿½atoire
-		// ï¿½ terme, il faudra renvoyer les donnï¿½es prï¿½sentes dans la base en fonction de l'ID du container qui ï¿½ envoyï¿½ la requï¿½te 
+		//[Kevin] : envoi de date au client container supprimé et remplacé par un entier aléatoire
+		// à terme, il faudra renvoyer les données présentes dans la base en fonction de l'ID du container qui à envoyé la requête 
 		addField(eltSupervisionState, "date_state", Integer.toString((int)(Math.random() * (100 - 0))));
 		
 		Element eltContainerSets = new Element("container_sets");
 		eltSupervisionState.addContent(eltContainerSets);
 		
-		try {
+		 try {
 			List<Typedechets> type_dechets = DAOFactory.creerDAOTypedechets().select();
 			for (Ilot ilot: DAOFactory.creerDAOIlot().select()) {
 				Element eltContainerSet = new Element("container_set");
@@ -182,7 +220,7 @@ public class RequestHandler {
 			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
 			buildResponseType(rootResp, "ERROR");
 			return;
-		}
+		} 
 
 		buildResponseType(rootResp, "RESP_SUPERVISION_STATE");
 		rootResp.addContent(eltSupervisionState);
