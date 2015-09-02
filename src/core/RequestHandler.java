@@ -94,6 +94,10 @@ public class RequestHandler {
 				handleReqAllContainers(rootReq,rootResp);
 				break;
 				
+			case "REQ_ALL_CAMIONS":
+				handleReqAllCamions(rootReq, rootResp);
+				break;
+				
 			case "TRIG_CIRCUIT_COMPUTATION":
 				handleTrigCircuitComputation(rootReq, rootResp);
 				break;
@@ -174,6 +178,37 @@ public class RequestHandler {
 		}
 
 		buildResponseType(rootResp, "OK");
+	}
+	
+	private void handleReqAllCamions(Element rootReq, Element rootResp) {
+		Element eltAllCamions = new Element("all_camions");	
+		Element eltContainerSets = new Element("camion_sets");
+		
+		eltAllCamions.addContent(eltContainerSets);
+		
+		 try {
+			
+			for (Camion camion: DAOFactory.creerDAOCamion().select()) {
+			//	Element eltCamionSet = new Element("camion_set");
+			//	eltContainerSets.addContent(eltCamionSet);
+
+				Element eltCamion = new Element("camion");
+				eltContainerSets.addContent(eltCamion);
+
+				addFieldInt(eltCamion, "id", camion.get_id());
+				addFieldInt(eltCamion, "poidsmax", camion.get_poidsmax());
+				addFieldInt(eltCamion, "volumemax", camion.get_volumemax());
+				addFieldInt(eltCamion, "typedechetsid", camion.get_Typedechets_id());
+				addFieldBool(eltCamion, "disponible", camion.get_disponible());
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
+			buildResponseType(rootResp, "ERROR");
+			return;
+		} 
+
+		buildResponseType(rootResp, "REQ_ALL_CAMIONS");
+		rootResp.addContent(eltAllCamions);
 	}
 	
 	private void handleReqSupervisionState(Element rootReq, Element rootResp) {
