@@ -250,6 +250,8 @@ public class RequestHandler {
 				eltContainerSets.addContent(eltContainerSet);
 				
 				addLocation(eltContainerSet, "location", ilot.getLocation());
+				addField(eltContainerSet, "address", ilot.get_adresse());
+				
 				boolean ilot_a_collecter = false;
 				for (Typedechets type_dechet: type_dechets) {
 					if (ilot.isReadyForCollect(type_dechet)) {
@@ -399,28 +401,31 @@ public class RequestHandler {
 		addFieldInt(eltCircuit, "index", circuitIndex);
 		addLocation(eltCircuit, "depot_location", depot);
 		addFieldInt(eltCircuit, "dechet_id", iti.get_Typedechets_id());
-		Element eltContainerSets = getIlotsdepassage(iti.get_ilotsdepassage()); 
+		Element eltContainerSets = getIlotsdepassage(iti); 
 		eltCircuit.addContent(eltContainerSets);
 		return eltCircuit;
 	}
 	
-	private Element getIlotsdepassage(List<Ilotdepassage> ilotsdepassage) {
+	private Element getIlotsdepassage(Itineraire iti) {
 		Element eltContainerSets = new Element("container_sets");
 		
-		for (Ilotdepassage ilotdepassage: ilotsdepassage) {
+		for (Ilotdepassage ilotdepassage: iti.get_ilotsdepassage()) {
 			Element eltContainerSet = new Element("container_set");
 			eltContainerSets.addContent(eltContainerSet);
 			Ilot ilot = ilotdepassage.get_Ilot();
 			
 			addLocation(eltContainerSet, "location", ilot.getLocation());
+			addField(eltContainerSet, "address", ilot.get_adresse());
 			
 			Element eltContainers = new Element("containers");
 			eltContainerSet.addContent(eltContainers);
 			for (Conteneur conteneur: ilot.get_conteneurs()) {
-				Element eltContainer = new Element("container");
-				eltContainers.addContent(eltContainer);
-				
-				addFieldInt(eltContainer, "id", conteneur.get_id());
+				if (conteneur.get_TypeDechets_id() == iti.get_Typedechets_id()) {
+					Element eltContainer = new Element("container");
+					eltContainers.addContent(eltContainer);
+					
+					addFieldInt(eltContainer, "id", conteneur.get_id());
+				}
 			}
 		}
 		return eltContainerSets;
