@@ -82,6 +82,10 @@ public class RequestHandler {
 		LOGGER.info("Client #"+clientNumber+" request: "+ requestType);
 		switch(requestType)
 		{
+			case "REQ_CONTAINER_INFO":
+				handleContainerInfo(rootReq, rootResp);
+				break;
+				
 			case "CONTAINER_REPORT":
 				handleContainerReport(rootReq, rootResp);
 				break;
@@ -142,34 +146,52 @@ public class RequestHandler {
 		
 	}
 	
+	private void handleContainerInfo(Element rootReq, Element rootResp) {
+		Element eltContainerInfo = new Element("container_info");
+		try {
+			Element eltContRep = rootReq.getChild("container_info");
+			int containerId = Integer.valueOf(eltContRep.getChild("id").getTextNormalize());
+			
+			DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
+			Conteneur c = daoconteneur.selectbyid(containerId);
+
+			addFieldInt(eltContainerInfo, "id", containerId);
+			addFieldInt(eltContainerInfo, "volume", c.get_lastvolume());
+			addFieldInt(eltContainerInfo, "volume_max", c.get_volumemax());
+			addFieldInt(eltContainerInfo, "weight", c.get_lastpoids());
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);
+			buildResponseType(rootResp, "ERROR");
+			return;
+		}
+
+		buildResponseType(rootResp, "RESP_CONTAINER_INFO");
+		rootResp.addContent(eltContainerInfo);
+	}
+	
 	private void handleContainerReport(Element rootReq, Element rootResp) {
 		try {
 
 			Element eltContRep = rootReq.getChild("container_report");
 			int containerId = Integer.valueOf(eltContRep.getChild("id").getTextNormalize());
 			int containerVolume = Integer.valueOf(eltContRep.getChild("volume").getTextNormalize());
+			//int containerWeight = Integer.valueOf(eltContRep.getChild("weight").getTextNormalize());
 			
 			DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
-			List<Conteneur> conteneurs = daoconteneur.select();
+			Conteneur c = daoconteneur.selectbyid(containerId);
+
+			int max = c.get_volumemax();
+			int current = c.get_lastvolume();
+			int poids = c.get_lastpoids();
 			
-					Conteneur c = conteneurs.get(containerId);
-					int max = c.get_volumemax();
-					int current = c.get_lastvolume();
-					int poids = c.get_lastpoids();
-					int min = max/2;
-					if(c.get_TypeDechets_id()==2) {
-						min = (int)max/3;
-					}
-					if(c.get_TypeDechets_id()==3) {
-						min = 0;
-					}
-					int volume = (int) (max);
-					int maxpoids = 350;
-					int minpoids = 30;
-					int newpoids = (int)(Math.random() * (maxpoids-minpoids)+minpoids);
-					c.majetat(containerVolume,volume);
-					System.out.println ("Conteneur: " + (c.get_id()-1) + " | Volmax: " + max + " | Oldvol: " + current + " | Newvol: " + containerVolume +" | OldPoids: " + poids +" | Newpoids: " + newpoids);
-					daoconteneur.majetat(c);
+			// generation random de poids
+			int maxpoids = 350;
+			int minpoids = 30;
+			int newpoids = (int)(Math.random() * (maxpoids-minpoids)+minpoids);
+
+			c.majetat(containerVolume, newpoids);
+			System.out.println ("Conteneur: " + (c.get_id()) + " | Volmax: " + max + " | Oldvol: " + current + " | Newvol: " + containerVolume +" | OldPoids: " + poids +" | Newpoids: " + newpoids);
+			daoconteneur.majetat(c);
 				
 			} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error connecting to DB", e);

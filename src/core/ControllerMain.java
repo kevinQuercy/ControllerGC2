@@ -21,7 +21,7 @@ public class ControllerMain {
 		Endpoint.publish("http://localhost:8081/WS/WSPlanification", new WSPlanificationImp());
 		Endpoint.publish("http://localhost:8081/WS/WSIlot", new WSIlotImp());
 		LOGGER.info("Starting");
-		int server_port = 10001; // default
+		int server_port = 10000; // default
 		
 		if (args.length >= 1)
 		{
