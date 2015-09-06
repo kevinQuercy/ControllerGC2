@@ -34,6 +34,18 @@
   </xs:sequence>
 </xs:complexType>
 
+<!-- response content for RESP_CONTAINER_INFO -->
+<xs:element name="container_info">
+  <xs:complexType>
+    <xs:sequence>
+	  <xs:element name="id" type="xs:integer"/>
+      <xs:element name="weight" type="xs:integer"/>
+      <xs:element name="volume" type="xs:integer"/>
+      <xs:element name="volumemax" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
 <!-- response content for RESP_SUPERVISION_STATE -->
 <xs:element name="supervision_state">
   <xs:complexType>
@@ -111,6 +123,7 @@
 		  <xs:restriction base="xs:string">
 			<xs:enumeration value="OK"/>
 			<xs:enumeration value="ERREUR"/>
+			<xs:enumeration value="RESP_CONTAINER_INFO"/>
 			<xs:enumeration value="RESP_SUPERVISION_STATE"/>
 			<xs:enumeration value="RESP_CIRCUITS"/><!-- get all circuits -->
 			<xs:enumeration value="RESP_CIRCUIT"/><!-- get one specific circuit -->
@@ -118,6 +131,7 @@
 		</xs:simpleType>
 	  </xs:element>
 	  <xs:choice minOccurs="0">
+		<xs:element ref="container_info"/>
 		<xs:element ref="supervision_state"/>
 		<xs:element ref="circuits"/>
 		<xs:element ref="circuit"/>

@@ -13,6 +13,15 @@
   </xs:complexType>
 </xs:element>
 
+<!-- request content for REQ_CONTAINER_INFO -->
+<xs:element name="container_info">
+  <xs:complexType>
+    <xs:sequence>
+	  <xs:element name="id" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
 <!-- request content for REQ_CIRCUIT -->
 <xs:element name="circuit">
   <xs:complexType>
@@ -29,6 +38,7 @@
 	    <xs:simpleType>
 		  <xs:restriction base="xs:string">
 			<xs:enumeration value="CONTAINER_REPORT"/>
+			<xs:enumeration value="REQ_CONTAINER_INFO"/>
 			<xs:enumeration value="REQ_SUPERVISION_STATE"/>
 			<xs:enumeration value="REQ_CIRCUITS"/><!-- get all circuits -->
 			<xs:enumeration value="REQ_CIRCUIT"/><!-- get one specific circuit -->
@@ -38,6 +48,7 @@
 	  </xs:element>
 	  <xs:choice minOccurs="0">
 		<xs:element ref="container_report"/>
+		<xs:element ref="container_info"/>
 		<xs:element ref="circuit"/>
 	  </xs:choice>
     </xs:sequence>
