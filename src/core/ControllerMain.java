@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import javax.xml.ws.Endpoint;
 
+import webservice.WSConteneurImp;
 import webservice.WSIlotImp;
 import webservice.WSPlanificationImp;
 
@@ -20,6 +21,7 @@ public class ControllerMain {
 		LOGGER.info("Starting the SOAP Server on port 8081");
 		Endpoint.publish("http://localhost:8081/WS/WSPlanification", new WSPlanificationImp());
 		Endpoint.publish("http://localhost:8081/WS/WSIlot", new WSIlotImp());
+		Endpoint.publish("http://localhost:8081/WS/WSConteneur", new WSConteneurImp());
 		LOGGER.info("Starting");
 		int server_port = 10000; // default
 		
