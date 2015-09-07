@@ -2,7 +2,10 @@ package DAOS;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+  /** 
 
+@author WillyCnam
+@version 1.0
 
 public class BDManager {
 	private static String url = "jdbc:mysql://localhost:3306/garbagecollector";
