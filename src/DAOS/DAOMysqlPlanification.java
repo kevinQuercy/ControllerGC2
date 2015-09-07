@@ -11,15 +11,16 @@ import data.Planification;
 public class DAOMysqlPlanification implements DAOPlanification {
 
 	@Override
+	// return a Planification selected by date
 	public Planification selectbydate(Date d) throws Exception {
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
 	    String sql = "SELECT * FROM Planification where date = '" + sdf.format(d) + "';";
         //ouvrir la connexion
         Connection cnx = BDManager.getConnexion();
-        //faire la requête
+        //faire la requÃªte
         Statement s = cnx.createStatement();
         ResultSet r = s.executeQuery(sql);
-        //traiter les réponses
+        //traiter les rÃ©ponses
 		Planification pl = new Planification();
 		r.beforeFirst();
 		r.next();
@@ -34,11 +35,12 @@ public class DAOMysqlPlanification implements DAOPlanification {
 	}
 
 	@Override
+	// insert a planification
 	public int insert(Planification pl) throws Exception {
 	    String sql = "INSERT INTO Planification (date,taux) " + " VALUES( ";
         //connexion
         Connection cnx = BDManager.getConnexion();
-        //executer la requête
+        //executer la requÃªte
         Statement s = cnx.createStatement();
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		sql += "'" + sdf.format(pl.get_date()) + "',";
@@ -57,6 +59,7 @@ public class DAOMysqlPlanification implements DAOPlanification {
 	}
 	
 	@Override
+	// Delete a planification by date
 	public int deletebydate(Date d) throws Exception {
 		// recherche de l'ID de la planification
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
