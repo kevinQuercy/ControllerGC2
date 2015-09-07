@@ -128,7 +128,7 @@ public class RequestHandler {
 			
 			// get container object associated to this ID
 			DAOConteneur daoConteneur = DAOFactory.creerDAOConteneur();
-			List<Conteneur> conteneurs = daoConteneur.select();
+			List<Conteneur> conteneurs = daoConteneur.selectjustid();
 			System.out.println(conteneurs);
 			
 			Element eltContainers= new Element("containers");

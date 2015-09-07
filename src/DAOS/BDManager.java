@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 
 public class BDManager {
 	private static String url = "jdbc:mysql://localhost:3306/garbagecollector";
-    //private static String url = "jdbc:mysql://192.168.10.2:3306/garbagecollector";
+    //private static String url = "jdbc:mysql://192.168.20.2:3306/garbagecollector";
     private static String driver = "com.mysql.jdbc.Driver";
     private static String login = "root";
     private static String password = "";

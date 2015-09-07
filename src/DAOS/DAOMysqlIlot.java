@@ -42,6 +42,32 @@ public class DAOMysqlIlot implements DAOIlot {
         cnx.close();
 
         return liste;
+	}	@Override
+	public List<Ilot> selectjustid() throws Exception {
+	    String sql = "SELECT 'id' FROM Ilot;";
+        List<Ilot> liste = new LinkedList<Ilot>();
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+
+        //traiter les réponses
+        while (r.next()) {
+        	Ilot h = new Ilot();
+            //récupérer les champs
+            h.set_id(r.getInt("id"));
+            DAOConteneur daoconteneur = DAOFactory.creerDAOConteneur();
+            h.set_conteneurs(daoconteneur.selectbyilotid(r.getInt("id")));
+            //ajouter à la liste
+            liste.add(h);
+        }
+        
+        r.close();
+        s.close();
+        cnx.close();
+
+        return liste;
 	}
 	
 	@Override

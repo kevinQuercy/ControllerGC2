@@ -43,6 +43,29 @@ public class DAOMysqlConteneur implements DAOConteneur {
         cnx.close();
 
         return liste;
+    }    @Override
+    public List<Conteneur> selectjustid() throws Exception {
+        String sql = "SELECT 'id' FROM conteneur;";
+        List<Conteneur> liste = new LinkedList<Conteneur>();
+        //ouvrir la connexion
+        Connection cnx = BDManager.getConnexion();
+        //faire la requête
+        Statement s = cnx.createStatement();
+        ResultSet r = s.executeQuery(sql);
+
+        //traiter les réponses
+        while (r.next()) {
+        	Conteneur h = new Conteneur();
+            //récupérer les champs
+            //ajouter à la liste
+            liste.add(h);
+        }
+        
+        r.close();
+        s.close();
+        cnx.close();
+
+        return liste;
     }
     
     @Override
